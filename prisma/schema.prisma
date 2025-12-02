@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Uniswap V3 交易数据
+model UniswapTrade {
+  id              String   @id @default(uuid())
+  transactionHash String   @unique
+  blockNumber     Int
+  timestamp       DateTime
+  poolAddress     String
+  token0Amount    Float
+  token1Amount    Float
+  priceUSDT       Float    // ETH 价格（USDT计价）
+  sender          String
+  recipient       String
+  createdAt       DateTime @default(now())
+  
+  @@index([timestamp])
+  @@index([poolAddress])
+}
+
+// Binance 交易数据
+model BinanceTrade {
+  id        String   @id @default(uuid())
+  tradeId   String   @unique
+  timestamp DateTime
+  symbol    String   // ETHUSDT
+  price     Float    // ETH 价格（USDT计价）
+  quantity  Float    // ETH 数量
+  isBuyerMaker Boolean
+  createdAt DateTime @default(now())
+  
+  @@index([timestamp])
+  @@index([symbol])
+}
+
+// 检测到的套利机会
+model ArbitrageOpportunity {
+  id                  String   @id @default(uuid())
+  timestamp           DateTime
+  uniswapPrice        Float
+  binancePrice        Float
+  priceDifference     Float    // 价格差异
+  priceDifferencePercent Float // 价格差异百分比
+  potentialProfitUSDT Float    // 潜在利润（USDT）
+  tradeAmount         Float    // 交易金额（ETH）
+  direction           String   // "buy_uniswap_sell_binance" 或 "buy_binance_sell_uniswap"
+  createdAt           DateTime @default(now())
+  
+  @@index([timestamp])
+}
