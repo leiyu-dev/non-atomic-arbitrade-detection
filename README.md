@@ -1,6 +1,6 @@
-# 非原子套利检测系统
+# 非原子套利分析系统
 
-这是一个用于检测和分析 Uniswap V3 与 Binance 之间非原子套利机会的 Web 应用程序。
+这是一个用于检测和分析 Uniswap V3 与 Binance/CEX 之间非原子套利的 Web 应用程序。
 
 ## 功能特性
 
@@ -15,6 +15,14 @@
 - 分析套利方向和价格差异分布
 - 提供详细的套利机会列表
 
+### 3. CEX-DEX 套利行为识别（新增）
+基于学术论文 [Measuring CEX-DEX Extracted Value and Searcher Profitability](https://arxiv.org/abs/2507.13023) 的方法：
+- 从本地 CSV 文件读取真实链上套利行为数据（test/data.csv）
+- 分析 Uniswap V3 USDT/ETH 池 (0x11b815efB8f581194ae79006d24E0d814B7697F6)
+- 展示 2025年9月1日至9月30日期间的 26 条套利交易
+- 识别 Top 套利者及其 MEV 提取价值
+- 提供详细的交易列表和统计分析
+
 ## 技术栈
 
 - **框架**: Next.js 16 (App Router)
@@ -23,6 +31,8 @@
 - **图表库**: ECharts
 - **数据库**: SQLite (通过 Prisma ORM)
 - **HTTP 客户端**: Axios
+- **数据源**: Dune Analytics API
+- **区块链数据**: Ethereum 链上交易数据
 
 ## 分析目标
 
@@ -46,16 +56,27 @@ npm install
 cp .env.example .env
 ```
 
+在 `.env` 文件中配置以下内容：
+
+```env
+# 数据库配置
+DATABASE_URL="file:./dev.db"
+```
+
+**注意：** CEX-DEX 套利行为识别模块已修改为从本地 CSV 文件读取数据，无需配置 Dune API Key。
+
 ### 3. 设置数据库
 
 ```bash
-# 设置环境变量并生成 Prisma Client
+# Windows PowerShell
 $env:DATABASE_URL="file:./dev.db"
 npx prisma generate
+npx prisma migrate dev --name init
 
-# 创建数据库迁移
-$env:DATABASE_URL="file:./dev.db"
-npx prisma migrate dev
+# 或者 Linux/Mac
+export DATABASE_URL="file:./dev.db"
+npx prisma generate
+npx prisma migrate dev --name init
 ```
 
 ### 4. 启动开发服务器
@@ -84,7 +105,7 @@ npm run dev
 
 ### 3. 检测套利机会
 
-在"套利分析"页面：
+在"套利机会检测"页面：
 1. 设置检测参数：
    - 最小利润百分比
    - 交易金额（ETH）
@@ -93,7 +114,20 @@ npm run dev
 2. 点击"开始检测"按钮
 3. 查看检测结果和统计信息
 
-### 4. 分析结果
+### 4. CEX-DEX 套利行为识别
+
+在"CEX-DEX套利行为识别"页面：
+1. 点击"获取最新数据"按钮从本地 CSV 文件（test/data.csv）加载数据
+2. 查看统计信息：
+   - 总交易数（26 条真实链上交易）
+   - 总 MEV 提取价值（以 ETH 计价）
+   - 总交易量（以 USD 计价）
+   - 套利者数量
+3. 查看 Top 套利者排行
+4. 浏览详细的套利交易列表
+5. 点击交易哈希可跳转到 Etherscan 查看链上详情
+
+### 5. 分析结果
 
 系统会展示：
 - 套利机会总数
@@ -101,6 +135,7 @@ npm run dev
 - 平均单次利润
 - 套利方向分布
 - 详细的套利机会列表
+- 真实链上套利行为及收益数据
 
 ## 套利检测算法
 
@@ -130,10 +165,17 @@ npm run dev
 
 ## API 端点
 
+### 套利机会检测相关
 - `POST /api/data/fetch` - 获取并存储交易数据
 - `GET /api/data/trades` - 获取交易数据
 - `POST /api/arbitrage/detect` - 检测套利机会
 - `GET /api/arbitrage/statistics` - 获取套利统计信息
+
+### CEX-DEX 套利行为识别相关
+- `POST /api/cexdex/fetch` - 从 Dune Analytics 获取套利行为数据
+- `GET /api/cexdex/list` - 获取套利行为列表
+- `GET /api/cexdex/statistics` - 获取套利行为统计信息
+- `GET /api/cexdex/searcher/[address]` - 获取指定套利者的详细信息
 
 ## 项目结构
 
@@ -145,25 +187,56 @@ npm run dev
 ├── src/
 │   ├── app/               # Next.js App Router
 │   │   ├── api/          # API 路由
+│   │   │   ├── arbitrage/    # 套利机会检测 API
+│   │   │   ├── cexdex/       # CEX-DEX 套利行为识别 API
+│   │   │   └── data/         # 数据获取 API
 │   │   ├── components/   # React 组件
 │   │   ├── price-comparison/  # 价格对比页面
-│   │   ├── arbitrage-analysis/ # 套利分析页面
+│   │   ├── arbitrage-analysis/ # 套利机会检测页面
+│   │   ├── cexdex-analysis/   # CEX-DEX套利行为识别页面
 │   │   └── page.tsx      # 主页
 │   └── lib/              # 工具和服务
 │       ├── prisma.ts     # Prisma 客户端
 │       └── services/     # 业务逻辑
 │           ├── binance.ts    # Binance 数据服务
 │           ├── uniswap.ts    # Uniswap 数据服务
-│           └── arbitrage.ts  # 套利检测服务
+│           ├── arbitrage.ts  # 套利机会检测服务
+│           ├── dune.ts       # Dune Analytics 集成
+│           └── cexdex-arbitrage.ts  # CEX-DEX 套利行为识别服务
 ├── package.json
 └── README.md
 ```
 
+## 数据说明
+
+### 套利机会检测模块
+- 当前使用模拟数据进行演示
+- 如需使用真实数据，请配置相应的 API Keys
+
+### CEX-DEX 套利行为识别模块
+- 使用 Dune Analytics 提供的真实链上数据
+- 数据来源：Query ID 6294574
+- 分析对象：Uniswap V3 池 0x11b815efB8f581194ae79006d24E0d814B7697F6
+- 时间范围：2025年9月1日 - 9月30日
+- 基于论文研究方法识别真实的套利行为
+
+## 学术参考
+
+本项目的 CEX-DEX 套利行为识别模块基于以下学术论文：
+
+**Measuring CEX-DEX Extracted Value and Searcher Profitability: The Darkest of the MEV Dark Forest**
+- 作者：Fei Wu, Danning Sui, Thomas Thiery, Mallesh Pai
+- arXiv: 2507.13023v3
+- 发布时间：2025年8月
+
+论文研究了以太坊上中心化交易所（CEX）和去中心化交易所（DEX）之间的套利行为，提供了识别和量化此类套利的方法论。
+
 ## 注意事项
 
-1. **数据源**: 当前使用模拟数据。如需使用真实数据，请配置 API Keys 并调整数据获取逻辑。
-2. **性能**: 大量数据可能影响性能，建议适当调整时间范围。
-3. **精度**: 套利检测结果仅供参考，实际交易需考虑更多因素。
+1. **API Key**: 使用 CEX-DEX 套利行为识别功能需要配置 Dune Analytics API Key
+2. **数据源**: 套利机会检测使用模拟数据，CEX-DEX 套利行为识别使用真实链上数据
+3. **性能**: 大量数据可能影响性能，建议适当调整时间范围和显示数量
+4. **精度**: 检测结果仅供学习和研究参考，不构成投资建议
 
 ## 许可证
 

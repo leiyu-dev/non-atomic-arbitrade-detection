@@ -25,13 +25,13 @@ export default function Home() {
       {/* 标题部分 */}
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
-          非原子套利检测系统
+          非原子套利分析系统
         </Typography>
         <Typography variant="h5" color="text.secondary" gutterBottom>
-          Uniswap V3 与 Binance 之间的套利机会分析
+          Uniswap V3 与 CEX 之间的套利分析平台
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-          分析时间段：2025年9月1日 - 9月30日
+          支持套利机会检测与真实链上套利行为识别
         </Typography>
       </Box>
 
@@ -76,7 +76,7 @@ export default function Home() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        {/* <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -110,7 +110,47 @@ export default function Home() {
                 href="/arbitrage-analysis"
                 fullWidth
               >
-                查看套利分析
+                查看套利机会
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid> */}
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Card sx={{ height: '100%', border: '2px solid', borderColor: 'warning.main' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <AccountBalanceIcon sx={{ fontSize: 40, color: 'warning.main', mr: 2 }} />
+                <Typography variant="h5" component="h2">
+                  套利行为识别
+                </Typography>
+              </Box>
+              <Typography variant="body1" color="text.secondary" paragraph>
+                基于学术论文方法，从 Dune Analytics 获取真实链上数据，
+                识别并分析 CEX-DEX 套利者的实际交易行为和盈利情况。
+              </Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemText primary="• 真实链上套利交易" />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="• Top 套利者排行" />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="• 收益与利润分析" />
+                </ListItem>
+              </List>
+            </CardContent>
+            <CardActions>
+              <Button
+                size="large"
+                variant="contained"
+                color="warning"
+                component={Link}
+                href="/cexdex-analysis"
+                fullWidth
+              >
+                查看套利行为
               </Button>
             </CardActions>
           </Card>
@@ -146,7 +186,7 @@ export default function Home() {
               </ListItem>
             </List>
           </Grid>
-
+{/* 
           <Grid size={{ xs: 12, md: 6 }}>
             <Typography variant="h6" gutterBottom color="secondary">
               检测方法
@@ -171,27 +211,8 @@ export default function Home() {
                 />
               </ListItem>
             </List>
-          </Grid>
+          </Grid> */}
         </Grid>
-      </Paper>
-
-      {/* 快速开始 */}
-      <Paper sx={{ p: 4, bgcolor: 'primary.main', color: 'white' }}>
-        <Typography variant="h5" gutterBottom fontWeight="bold">
-          快速开始
-        </Typography>
-        <Typography variant="body1" paragraph>
-          1. 访问"价格对比"页面，点击"重新获取数据"按钮导入交易数据
-        </Typography>
-        <Typography variant="body1" paragraph>
-          2. 查看 Uniswap V3 与 Binance 的价格走势图表
-        </Typography>
-        <Typography variant="body1" paragraph>
-          3. 访问"套利分析"页面，设置检测参数并点击"开始检测"
-        </Typography>
-        <Typography variant="body1">
-          4. 查看检测到的套利机会详情和统计分析
-        </Typography>
       </Paper>
     </Container>
   );

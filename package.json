@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@duneanalytics/client-sdk": "^0.3.4",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.5",

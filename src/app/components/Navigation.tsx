@@ -11,7 +11,7 @@ export default function Navigation() {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 0, mr: 4 }}>
-          非原子套利检测
+          非原子套利分析系统
         </Typography>
         <Box sx={{ flexGrow: 1, display: 'flex', gap: 2 }}>
           <Button
@@ -36,7 +36,8 @@ export default function Navigation() {
           >
             价格对比
           </Button>
-          <Button
+          {/* 套利机会检测页面已隐藏 */}
+          {/* <Button
             color="inherit"
             component={Link}
             href="/arbitrage-analysis"
@@ -45,7 +46,18 @@ export default function Navigation() {
               textDecoration: pathname === '/arbitrage-analysis' ? 'underline' : 'none',
             }}
           >
-            套利分析
+            套利机会检测
+          </Button> */}
+          <Button
+            color="inherit"
+            component={Link}
+            href="/cexdex-analysis"
+            sx={{
+              fontWeight: pathname === '/cexdex-analysis' ? 'bold' : 'normal',
+              textDecoration: pathname === '/cexdex-analysis' ? 'underline' : 'none',
+            }}
+          >
+            CEX-DEX套利行为识别
           </Button>
         </Box>
       </Toolbar>
