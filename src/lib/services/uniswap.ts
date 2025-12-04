@@ -176,3 +176,83 @@ export async function generateMockUniswapData(
   return trades;
 }
 
+/**
+ * 使用 Dune API 获取 Uniswap V3 交易数据 (替代 The Graph)
+ * 修改：直接获取最新结果，绕过执行/轮询流程
+ */
+export async function fetchUniswapTradesFromDune(
+  poolAddress: string = POOL_ADDRESS,
+  startTimestamp: number,
+  endTimestamp: number
+): Promise<UniswapSwapEvent[]> {
+  
+  const DUNE_API_KEY = process.env.DUNE_API_KEY;
+  const QUERY_ID = 6298929; // ！！！请确认这是你最终要用的查询ID
+  
+  if (!DUNE_API_KEY) {
+    throw new Error('DUNE_API_KEY 未在环境变量中设置');
+  }
+
+  try {
+    console.log(`正在从 Dune 查询 #${QUERY_ID} 获取最新结果...`);
+    
+    // 关键修改：直接请求查询的最新结果（JSON格式）
+    const response = await axios.get(
+      `https://api.dune.com/api/v1/query/${QUERY_ID}/results`, // 使用 /results 而非 /execute
+      { 
+        headers: { 
+          'X-Dune-API-Key': DUNE_API_KEY 
+        },
+        // 注意：如果你的查询需要参数，需要通过 query parameters 传递
+        // 例如：`.../results?params=${encodeURIComponent(JSON.stringify({pool_address: poolAddress}))}`
+        // 但首先请确认你的SQL查询是否已写死地址和时间范围。
+      }
+    );
+
+    // 检查响应结构
+    if (!response.data || !response.data.result) {
+      console.error('Dune API 返回的数据结构异常:', response.data);
+      return [];
+    }
+
+    const duneResult = response.data.result;
+    const duneRows = duneResult.rows || [];
+    
+    console.log(`成功从 Dune 获取原始数据 ${duneRows.length} 条`);
+
+    // 转换数据格式
+    const formattedTrades: UniswapSwapEvent[] = duneRows.map((row: any) => {
+      // 重要：以下映射必须与你的Dune SQL查询SELECT的字段名（别名）完全匹配
+      // Dune API返回的字段名默认是全小写的，即使你在SQL中用了大写别名。
+      // 请根据你实际的SQL查询输出，调整这里的属性名。
+      return {
+        transactionHash: row.transactionhash || row.transactionHash || '', // 注意大小写
+        blockNumber: parseInt(row.blocknumber || row.blockNumber) || 0,
+        timestamp: Math.floor(new Date(row.timestamp).getTime()), // 将时间字符串转为毫秒时间戳
+        sender: row.sender || '',
+        recipient: row.recipient || '',
+        amount0: String(row.amount0 || 0),
+        amount1: String(row.amount1 || 0),
+        sqrtPriceX96: String(row.sqrtpricex96 || row.sqrtPriceX96 || 0),
+        liquidity: String(row.liquidity || 0),
+        tick: Number(row.tick) || 0,
+      };
+    });
+
+    console.log(`已转换数据格式，数量: ${formattedTrades.length}`);
+    return formattedTrades;
+
+  } catch (error: any) {
+    console.error('从 Dune 获取数据失败:');
+    // 增强错误日志
+    if (error.response) {
+      console.error('HTTP 状态码:', error.response.status);
+      console.error('错误响应:', error.response.data);
+    } else {
+      console.error('错误信息:', error.message);
+    }
+    // 可以选择返回空数组，或者抛出错误由上层处理
+    // return []; 
+    throw error;
+  }
+}
