@@ -15,14 +15,12 @@ export interface ArbitrageDetectionResult {
  * 套利检测参数
  */
 export interface ArbitrageDetectionParams {
-  minProfitPercent: number; // 最小利润百分比阈值
   tradeAmountETH: number; // 交易金额（ETH）
   tradingFeePercent: number; // 交易手续费百分比
   slippagePercent: number; // 滑点百分比
 }
 
 const DEFAULT_PARAMS: ArbitrageDetectionParams = {
-  minProfitPercent: 0.5, // 0.5% 最小利润
   tradeAmountETH: 1, // 1 ETH 交易金额
   tradingFeePercent: 0.3, // 0.3% 交易手续费 (Uniswap V3 + Binance)
   slippagePercent: 0.1, // 0.1% 滑点
@@ -34,9 +32,19 @@ const DEFAULT_PARAMS: ArbitrageDetectionParams = {
 export async function detectArbitrageOpportunities(
   startTime: Date,
   endTime: Date,
-  params: ArbitrageDetectionParams = DEFAULT_PARAMS
+  params: ArbitrageDetectionParams = DEFAULT_PARAMS,
+  onProgress?: (progress: {
+    current: number;
+    total: number;
+    percentage: number;
+    foundOpportunities: number;
+  }) => void
 ): Promise<ArbitrageDetectionResult[]> {
+  console.log('开始检测套利机会...');
+  console.log(`时间范围: ${startTime.toISOString()} 至 ${endTime.toISOString()}`);
+  
   // 获取时间范围内的交易数据
+  console.log('正在获取交易数据...');
   const [uniswapTrades, binanceTrades] = await Promise.all([
     prisma.uniswapTrade.findMany({
       where: {
@@ -62,12 +70,36 @@ export async function detectArbitrageOpportunities(
     }),
   ]);
 
+  console.log(`获取到 ${uniswapTrades.length} 条 Uniswap 交易数据`);
+  console.log(`获取到 ${binanceTrades.length} 条 Binance 交易数据`);
+
   const opportunities: ArbitrageDetectionResult[] = [];
 
   // 使用滑动窗口方法匹配时间接近的交易
   const timeWindowMs = 60000; // 1分钟时间窗口
 
+  const totalTrades = uniswapTrades.length;
+  let processedCount = 0;
+  const progressInterval = Math.max(1, Math.floor(totalTrades / 100)); // 每1%输出一次进度
+
+  console.log('开始分析交易数据...');
   for (const uniswapTrade of uniswapTrades) {
+    processedCount++;
+    
+    // 输出进度
+    if (processedCount % progressInterval === 0 || processedCount === totalTrades) {
+      const percentage = Math.round((processedCount / totalTrades) * 100);
+      console.log(`检测进度: ${processedCount}/${totalTrades} (${percentage}%) - 已发现 ${opportunities.length} 个套利机会`);
+      
+      if (onProgress) {
+        onProgress({
+          current: processedCount,
+          total: totalTrades,
+          percentage,
+          foundOpportunities: opportunities.length,
+        });
+      }
+    }
     // 找到时间窗口内最接近的 Binance 交易
     const matchingBinanceTrades = binanceTrades.filter(
       bt =>
@@ -120,13 +152,8 @@ export async function detectArbitrageOpportunities(
       potentialProfitUSDT = grossProfit - fees;
     }
 
-    // 只记录超过最小利润阈值的机会
-    const profitPercent =
-      (potentialProfitUSDT /
-        (Math.min(uniswapPrice, binancePrice) * params.tradeAmountETH)) *
-      100;
-
-    if (profitPercent >= params.minProfitPercent) {
+    // 只要有可能盈利就记录为套利机会
+    if (potentialProfitUSDT > 0) {
       opportunities.push({
         timestamp: uniswapTrade.timestamp,
         uniswapPrice,
@@ -140,6 +167,17 @@ export async function detectArbitrageOpportunities(
     }
   }
 
+  console.log(`检测完成！共发现 ${opportunities.length} 个套利机会`);
+  
+  if (onProgress) {
+    onProgress({
+      current: totalTrades,
+      total: totalTrades,
+      percentage: 100,
+      foundOpportunities: opportunities.length,
+    });
+  }
+
   return opportunities;
 }
 
@@ -147,8 +185,26 @@ export async function detectArbitrageOpportunities(
  * 保存套利机会到数据库
  */
 export async function saveArbitrageOpportunities(
-  opportunities: ArbitrageDetectionResult[]
+  opportunities: ArbitrageDetectionResult[],
+  deleteExisting: boolean = true
 ): Promise<void> {
+  // 删除之前的套利机会
+  if (deleteExisting) {
+    console.log('正在删除之前的套利机会...');
+    const deletedCount = await prisma.arbitrageOpportunity.deleteMany({});
+    console.log(`已删除 ${deletedCount.count} 个之前的套利机会`);
+  }
+
+  if (opportunities.length === 0) {
+    console.log('没有套利机会需要保存');
+    return;
+  }
+
+  console.log(`开始保存 ${opportunities.length} 个套利机会到数据库...`);
+  const total = opportunities.length;
+  let savedCount = 0;
+  const progressInterval = Math.max(1, Math.floor(total / 20)); // 每5%输出一次进度
+
   for (const opp of opportunities) {
     await prisma.arbitrageOpportunity.create({
       data: {
@@ -162,7 +218,15 @@ export async function saveArbitrageOpportunities(
         direction: opp.direction,
       },
     });
+    
+    savedCount++;
+    if (savedCount % progressInterval === 0 || savedCount === total) {
+      const percentage = Math.round((savedCount / total) * 100);
+      console.log(`保存进度: ${savedCount}/${total} (${percentage}%)`);
+    }
   }
+
+  console.log(`保存完成！已保存 ${savedCount} 个套利机会到数据库`);
 }
 
 /**
