@@ -54,49 +54,52 @@ export async function POST(request: NextRequest) {
     console.log(`已删除 ${deletedBinanceCount.count} 条 Binance 交易记录`);
     console.log(`已删除 ${deletedUniswapCount.count} 条 Uniswap 交易记录`);
 
-    // 存储 Binance 数据
+    // 准备批量插入的数据
+    const binanceData = binanceTrades.map(trade => ({
+      tradeId: trade.tradeId,
+      timestamp: new Date(trade.timestamp),
+      symbol: trade.symbol,
+      price: trade.price,
+      quantity: trade.quantity,
+      isBuyerMaker: trade.isBuyerMaker,
+    }));
+
+    const uniswapData = uniswapTrades.map(trade => ({
+      transactionHash: trade.transactionHash,
+      blockNumber: trade.blockNumber,
+      timestamp: new Date(trade.timestamp),
+      poolAddress: trade.poolAddress,
+      token0Amount: trade.token0Amount,
+      token1Amount: trade.token1Amount,
+      priceUSDT: trade.priceUSDT,
+      sender: trade.sender,
+      recipient: trade.recipient,
+    }));
+
+    // 批量插入数据（分批处理，每批 1000 条）
+    const BATCH_SIZE = 1000;
     let binanceCount = 0;
-    for (const trade of binanceTrades) {
-      try {
-        await prisma.binanceTrade.create({
-          data: {
-            tradeId: trade.tradeId,
-            timestamp: new Date(trade.timestamp),
-            symbol: trade.symbol,
-            price: trade.price,
-            quantity: trade.quantity,
-            isBuyerMaker: trade.isBuyerMaker,
-          },
-        });
-        binanceCount++;
-      } catch (err) {
-        console.warn(`存储 Binance 交易失败 (${trade.tradeId}):`, err);
-      }
-    }
-
-    // 存储 Uniswap 数据
     let uniswapCount = 0;
-    for (const trade of uniswapTrades) {
-      try {
-        await prisma.uniswapTrade.create({
-          data: {
-            transactionHash: trade.transactionHash,
-            blockNumber: trade.blockNumber,
-            timestamp: new Date(trade.timestamp),
-            poolAddress: trade.poolAddress,
-            token0Amount: trade.token0Amount,
-            token1Amount: trade.token1Amount,
-            priceUSDT: trade.priceUSDT,
-            sender: trade.sender,
-            recipient: trade.recipient,
-          },
-        });
-        uniswapCount++;
-      } catch (err) {
-        console.warn(`存储 Uniswap 交易失败 (${trade.transactionHash}):`, err);
-      }
+
+    console.log('开始批量插入数据...');
+``
+    // 分批插入 Binance 数据
+    for (let i = 0; i < binanceData.length; i += BATCH_SIZE) {
+      const batch = binanceData.slice(i, i + BATCH_SIZE);
+      await prisma.binanceTrade.createMany({
+        data: batch,
+      });
     }
 
+    // 分批插入 Uniswap 数据
+    for (let i = 0; i < uniswapData.length; i += BATCH_SIZE) {
+      const batch = uniswapData.slice(i, i + BATCH_SIZE);
+      await prisma.uniswapTrade.createMany({
+        data: batch,
+      });
+    }
+
+    // 等待所有插入完成
     return NextResponse.json({
       success: true,
       message: '从本地 CSV 文件获取数据成功',
