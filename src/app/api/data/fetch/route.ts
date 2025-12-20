@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { generateMockUniswapData } from '@/lib/services/uniswap';
+import {
+  readBinanceTradesFromCSV,
+  readUniswapTradesFromCSV,
+  getBinanceTradesCSVPath,
+  getUniswapTradesCSVPath,
+} from '@/lib/services/csv-reader';
 
 /**
- * 获取并存储交易数据
+ * 从本地 CSV 文件获取并存储交易数据
  */
 export async function POST(request: NextRequest) {
   try {
@@ -12,70 +17,99 @@ export async function POST(request: NextRequest) {
     const startTime = new Date(startDate);
     const endTime = new Date(endDate);
 
-    // 生成模拟 Uniswap 数据
-    const uniswapTrades = await generateMockUniswapData(
-      startTime.getTime(),
-      endTime.getTime()
-    );
+    // 从本地 CSV 文件读取数据
+    const binanceCSVPath = getBinanceTradesCSVPath();
+    const uniswapCSVPath = getUniswapTradesCSVPath();
 
-    // 存储 Uniswap 数据
-    for (const trade of uniswapTrades) {
-      const price = parseFloat(trade.amountUSD) / parseFloat(trade.amount0);
-      
-      await prisma.uniswapTrade.upsert({
-        where: { transactionHash: trade.transaction.id },
-        update: {},
-        create: {
-          transactionHash: trade.transaction.id,
-          blockNumber: trade.transaction.blockNumber,
-          timestamp: new Date(trade.timestamp * 1000),
-          poolAddress: '0x11b815efB8f581194ae79006d24E0d814B7697F6',
-          token0Amount: parseFloat(trade.amount0),
-          token1Amount: parseFloat(trade.amount1),
-          priceUSDT: price,
-          sender: trade.sender,
-          recipient: trade.recipient,
-        },
-      });
-    }
+    console.log(`正在从本地 CSV 文件读取数据...`);
+    console.log(`Binance CSV 路径: ${binanceCSVPath}`);
+    console.log(`Uniswap CSV 路径: ${uniswapCSVPath}`);
 
-    // 生成模拟 Binance 数据
-    const binanceTrades = [];
-    const basePrice = 2500;
-    
-    for (let ts = startTime.getTime(); ts <= endTime.getTime(); ts += 3600000) {
-      const randomVariation = (Math.random() - 0.5) * 100;
-      const price = basePrice + randomVariation + Math.sin(ts / 86400000) * 50;
-      
-      binanceTrades.push({
-        tradeId: `binance-${ts}`,
-        timestamp: new Date(ts),
-        symbol: 'ETHUSDT',
-        price: price + (Math.random() - 0.5) * 10,
-        quantity: Math.random() * 5,
-        isBuyerMaker: Math.random() > 0.5,
-      });
-    }
+    // 读取 CSV 文件
+    const binanceTradesRaw = readBinanceTradesFromCSV(binanceCSVPath);
+    const uniswapTradesRaw = readUniswapTradesFromCSV(uniswapCSVPath);
+
+    console.log(`从 CSV 文件读取到 ${binanceTradesRaw.length} 条 Binance 交易记录`);
+    console.log(`从 CSV 文件读取到 ${uniswapTradesRaw.length} 条 Uniswap 交易记录`);
+
+    // 过滤时间范围内的数据
+    const binanceTrades = binanceTradesRaw.filter(trade => {
+      const tradeTime = new Date(trade.timestamp);
+      return tradeTime >= startTime && tradeTime <= endTime;
+    });
+
+    const uniswapTrades = uniswapTradesRaw.filter(trade => {
+      const tradeTime = new Date(trade.timestamp);
+      return tradeTime >= startTime && tradeTime <= endTime;
+    });
+
+    console.log(`时间范围过滤后: ${binanceTrades.length} 条 Binance 交易, ${uniswapTrades.length} 条 Uniswap 交易`);
+
+    // 删除数据库中所有原有数据
+    console.log('正在删除数据库中的原有数据...');
+    const [deletedBinanceCount, deletedUniswapCount] = await Promise.all([
+      prisma.binanceTrade.deleteMany({}),
+      prisma.uniswapTrade.deleteMany({}),
+    ]);
+    console.log(`已删除 ${deletedBinanceCount.count} 条 Binance 交易记录`);
+    console.log(`已删除 ${deletedUniswapCount.count} 条 Uniswap 交易记录`);
 
     // 存储 Binance 数据
+    let binanceCount = 0;
     for (const trade of binanceTrades) {
-      await prisma.binanceTrade.upsert({
-        where: { tradeId: trade.tradeId },
-        update: {},
-        create: trade,
-      });
+      try {
+        await prisma.binanceTrade.create({
+          data: {
+            tradeId: trade.tradeId,
+            timestamp: new Date(trade.timestamp),
+            symbol: trade.symbol,
+            price: trade.price,
+            quantity: trade.quantity,
+            isBuyerMaker: trade.isBuyerMaker,
+          },
+        });
+        binanceCount++;
+      } catch (err) {
+        console.warn(`存储 Binance 交易失败 (${trade.tradeId}):`, err);
+      }
+    }
+
+    // 存储 Uniswap 数据
+    let uniswapCount = 0;
+    for (const trade of uniswapTrades) {
+      try {
+        await prisma.uniswapTrade.create({
+          data: {
+            transactionHash: trade.transactionHash,
+            blockNumber: trade.blockNumber,
+            timestamp: new Date(trade.timestamp),
+            poolAddress: trade.poolAddress,
+            token0Amount: trade.token0Amount,
+            token1Amount: trade.token1Amount,
+            priceUSDT: trade.priceUSDT,
+            sender: trade.sender,
+            recipient: trade.recipient,
+          },
+        });
+        uniswapCount++;
+      } catch (err) {
+        console.warn(`存储 Uniswap 交易失败 (${trade.transactionHash}):`, err);
+      }
     }
 
     return NextResponse.json({
       success: true,
-      message: '数据获取成功',
-      uniswapCount: uniswapTrades.length,
-      binanceCount: binanceTrades.length,
+      message: '从本地 CSV 文件获取数据成功',
+      uniswapCount,
+      binanceCount,
     });
   } catch (error) {
-    console.error('数据获取失败:', error);
+    console.error('从本地 CSV 文件获取数据失败:', error);
     return NextResponse.json(
-      { success: false, error: '数据获取失败' },
+      {
+        success: false,
+        error: error instanceof Error ? error.message : '从本地 CSV 文件获取数据失败',
+      },
       { status: 500 }
     );
   }

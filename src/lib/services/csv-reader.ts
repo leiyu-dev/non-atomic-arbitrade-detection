@@ -152,7 +152,7 @@ export function getDefaultCSVPath(): string {
  * 按顺序读取 data/data1.csv 到 data/data4.csv
  */
 export function getDefaultCSVPaths(): string[] {
-  const dataDir = path.join(process.cwd(), 'data');
+  const dataDir = path.join(process.cwd(), 'public', 'data');
   const paths: string[] = [];
   
   // 尝试读取 data1.csv 到 data4.csv
@@ -198,5 +198,153 @@ export function readCexDexArbitrageFromMultipleCSV(csvPaths: string[]): DuneCexD
 
   console.log(`总共读取 ${allRecords.length} 条唯一记录`);
   return allRecords;
+}
+
+/**
+ * Binance 交易数据接口
+ */
+export interface BinanceTradeRecord {
+  id: string;
+  tradeId: string;
+  timestamp: string;
+  symbol: string;
+  price: number;
+  quantity: number;
+  isBuyerMaker: boolean;
+  createdAt: string;
+}
+
+/**
+ * Uniswap 交易数据接口
+ */
+export interface UniswapTradeRecord {
+  id: string;
+  transactionHash: string;
+  blockNumber: number;
+  timestamp: string;
+  poolAddress: string;
+  token0Amount: number;
+  token1Amount: number;
+  priceUSDT: number;
+  sender: string;
+  recipient: string;
+  createdAt: string;
+}
+
+/**
+ * 从本地 CSV 文件读取 Binance 交易数据
+ */
+export function readBinanceTradesFromCSV(csvPath: string): BinanceTradeRecord[] {
+  try {
+    const csvContent = fs.readFileSync(csvPath, 'utf-8');
+    const lines = csvContent.split('\n').filter(line => line.trim());
+    
+    if (lines.length === 0) {
+      return [];
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim());
+    const records: BinanceTradeRecord[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      const values = parseCSVLine(line);
+      
+      if (values.length !== headers.length) {
+        console.warn(`第 ${i + 1} 行字段数量不匹配，跳过`);
+        continue;
+      }
+
+      const record: any = {};
+      headers.forEach((header, index) => {
+        record[header] = values[index];
+      });
+
+      records.push({
+        id: record.id || '',
+        tradeId: record.tradeId || '',
+        timestamp: record.timestamp || '',
+        symbol: record.symbol || 'ETHUSDT',
+        price: parseFloat(record.price) || 0,
+        quantity: parseFloat(record.quantity) || 0,
+        isBuyerMaker: record.isBuyerMaker === 'true' || record.isBuyerMaker === true,
+        createdAt: record.createdAt || '',
+      });
+    }
+
+    return records;
+  } catch (error) {
+    console.error('读取 Binance CSV 文件失败:', error);
+    throw new Error(`无法读取 Binance CSV 文件: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
+ * 从本地 CSV 文件读取 Uniswap 交易数据
+ */
+export function readUniswapTradesFromCSV(csvPath: string): UniswapTradeRecord[] {
+  try {
+    const csvContent = fs.readFileSync(csvPath, 'utf-8');
+    const lines = csvContent.split('\n').filter(line => line.trim());
+    
+    if (lines.length === 0) {
+      return [];
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim());
+    const records: UniswapTradeRecord[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      const values = parseCSVLine(line);
+      
+      if (values.length !== headers.length) {
+        console.warn(`第 ${i + 1} 行字段数量不匹配，跳过`);
+        continue;
+      }
+
+      const record: any = {};
+      headers.forEach((header, index) => {
+        record[header] = values[index];
+      });
+
+      records.push({
+        id: record.id || '',
+        transactionHash: record.transactionHash || '',
+        blockNumber: parseInt(record.blockNumber) || 0,
+        timestamp: record.timestamp || '',
+        poolAddress: record.poolAddress || '',
+        token0Amount: parseFloat(record.token0Amount) || 0,
+        token1Amount: parseFloat(record.token1Amount) || 0,
+        priceUSDT: parseFloat(record.priceUSDT) || 0,
+        sender: record.sender || '',
+        recipient: record.recipient || '',
+        createdAt: record.createdAt || '',
+      });
+    }
+
+    return records;
+  } catch (error) {
+    console.error('读取 Uniswap CSV 文件失败:', error);
+    throw new Error(`无法读取 Uniswap CSV 文件: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
+ * 获取 Binance 交易数据 CSV 文件路径
+ */
+export function getBinanceTradesCSVPath(): string {
+  return path.join(process.cwd(), 'public', 'data', 'binance_trades.csv');
+}
+
+/**
+ * 获取 Uniswap 交易数据 CSV 文件路径
+ */
+export function getUniswapTradesCSVPath(): string {
+  return path.join(process.cwd(), 'public', 'data', 'uniswap_trades.csv');
 }
 
