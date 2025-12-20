@@ -36,8 +36,7 @@ export default function Navigation() {
           >
             价格对比
           </Button>
-          {/* 套利机会检测页面已隐藏 */}
-          {/* <Button
+          <Button
             color="inherit"
             component={Link}
             href="/arbitrage-analysis"
@@ -47,7 +46,7 @@ export default function Navigation() {
             }}
           >
             套利机会检测
-          </Button> */}
+          </Button>
           <Button
             color="inherit"
             component={Link}

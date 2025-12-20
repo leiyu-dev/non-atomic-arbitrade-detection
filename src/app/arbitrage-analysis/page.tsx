@@ -55,10 +55,9 @@ export default function ArbitrageAnalysisPage() {
 
   // 检测参数
   const [params, setParams] = useState({
-    minProfitPercent: 0.5,
     tradeAmountETH: 1,
-    tradingFeePercent: 0.3,
-    slippagePercent: 0.1,
+    tradingFeePercent: 0.1,
+    slippagePercent: 0,
   });
 
   const startDate = '2025-09-01';
@@ -301,48 +300,40 @@ export default function ArbitrageAnalysisPage() {
           检测参数设置
         </Typography>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <TextField
-              fullWidth
-              label="最小利润百分比 (%)"
-              type="number"
-              value={params.minProfitPercent}
-              onChange={e =>
-                setParams({ ...params, minProfitPercent: parseFloat(e.target.value) })
-              }
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <TextField
               fullWidth
               label="交易金额 (ETH)"
               type="number"
-              value={params.tradeAmountETH}
-              onChange={e =>
-                setParams({ ...params, tradeAmountETH: parseFloat(e.target.value) })
-              }
+              value={isNaN(params.tradeAmountETH) ? '' : params.tradeAmountETH}
+              onChange={e => {
+                const value = parseFloat(e.target.value);
+                setParams({ ...params, tradeAmountETH: isNaN(value) ? 0 : value });
+              }}
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <TextField
               fullWidth
               label="交易手续费 (%)"
               type="number"
-              value={params.tradingFeePercent}
-              onChange={e =>
-                setParams({ ...params, tradingFeePercent: parseFloat(e.target.value) })
-              }
+              value={isNaN(params.tradingFeePercent) ? '' : params.tradingFeePercent}
+              onChange={e => {
+                const value = parseFloat(e.target.value);
+                setParams({ ...params, tradingFeePercent: isNaN(value) ? 0 : value });
+              }}
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <TextField
               fullWidth
               label="滑点 (%)"
               type="number"
-              value={params.slippagePercent}
-              onChange={e =>
-                setParams({ ...params, slippagePercent: parseFloat(e.target.value) })
-              }
+              value={isNaN(params.slippagePercent) ? '' : params.slippagePercent}
+              onChange={e => {
+                const value = parseFloat(e.target.value);
+                setParams({ ...params, slippagePercent: isNaN(value) ? 0 : value });
+              }}
             />
           </Grid>
         </Grid>

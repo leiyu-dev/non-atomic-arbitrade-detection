@@ -37,7 +37,7 @@ export default function Home() {
 
       {/* 功能介绍卡片 */}
       <Grid container spacing={4} sx={{ mb: 6 }}>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -76,7 +76,7 @@ export default function Home() {
           </Card>
         </Grid>
 
-        {/* <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -114,9 +114,9 @@ export default function Home() {
               </Button>
             </CardActions>
           </Card>
-        </Grid> */}
+        </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ height: '100%', border: '2px solid', borderColor: 'warning.main' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>

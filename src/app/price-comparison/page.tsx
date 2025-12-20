@@ -287,7 +287,7 @@ export default function PriceComparisonPage() {
           onClick={fetchNewData}
           disabled={fetchingData}
         >
-          {fetchingData ? <CircularProgress size={24} /> : '重新获取数据'}
+          {fetchingData ? <CircularProgress size={24} /> : '从本地重新获取数据'}
         </Button>
       </Box>
 
