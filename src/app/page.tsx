@@ -20,6 +20,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import BoltIcon from '@mui/icons-material/Bolt';
+import ParticleBackground from '@/app/components/ParticleBackground';
 
 export default function Home() {
   const features = [
@@ -52,10 +53,23 @@ export default function Home() {
   return (
     <Box sx={{ 
       minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 50%, #2A2A2A 100%)',
-      color: 'white'
+      position: 'relative',
+      overflow: 'hidden'
     }}>
-      {/* Hero Section */}
+      {/* 粒子特效背景 - 设置更低的透明度 */}
+      <Box sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 0,
+        opacity: 0.3, // 降低整体透明度
+      }}>
+        <ParticleBackground />
+      </Box>
+
+      {/* Hero Section - 隐藏粒子效果 */}
       <Box 
         sx={{ 
           background: 'linear-gradient(135deg, #0A0A0A 0%, #0F1A15 30%, #1A2A22 70%, #0F1A15 100%)',
@@ -64,6 +78,7 @@ export default function Home() {
           position: 'relative',
           overflow: 'hidden',
           borderBottom: '1px solid rgba(0, 255, 136, 0.2)',
+          zIndex: 2, // 确保在粒子层之上
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -110,7 +125,7 @@ export default function Home() {
               letterSpacing: '-0.5px',
               lineHeight: 1.1,
               mb: 2,
-              fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem', lg: '4rem' }, // 增加字体大小
+              fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem', lg: '4rem' },
             }}>
               非原子套利分析系统
             </Typography>
@@ -203,196 +218,203 @@ export default function Home() {
         </Container>
       </Box>
 
-      {/* Features Section */}
-      <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Grid container spacing={4}>
-          {features.map((feature, index) => (
-            <Grid key={feature.title} size={{ xs: 12, md: 4 }}>
-              <Card 
-                className="fade-in"
+      {/* Features Section - 显示微妙的粒子效果 */}
+      <Box sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth="lg" sx={{ py: 10 }}>
+          <Grid container spacing={4}>
+            {features.map((feature, index) => (
+              <Grid key={feature.title} size={{ xs: 12, md: 4 }}>
+                <Card 
+                  className="fade-in"
+                  sx={{ 
+                    height: '100%',
+                    transition: 'all 0.3s ease',
+                    backgroundColor: 'rgba(42, 42, 42, 0.7)', // 半透明背景
+                    backdropFilter: 'blur(10px)', // 毛玻璃效果
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 4 }}>
+                    <Box 
+                      sx={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 80,
+                        height: 80,
+                        borderRadius: 3,
+                        background: 'linear-gradient(135deg, rgba(42, 42, 42, 0.8) 0%, rgba(58, 58, 58, 0.8) 100%)',
+                        color: '#00FF88',
+                        mb: 3,
+                        mx: 'auto',
+                        border: '1px solid rgba(0, 255, 136, 0.3)',
+                      }}
+                    >
+                      {feature.icon}
+                    </Box>
+                    <Typography variant="h5" component="h3" gutterBottom align="center" fontWeight={600}>
+                      {feature.title}
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" paragraph align="center">
+                      {feature.description}
+                    </Typography>
+                    <List dense>
+                      {feature.features.map((item) => (
+                        <ListItem key={item} sx={{ px: 0 }}>
+                          <Box 
+                            component="span" 
+                            sx={{ 
+                              color: '#00FF88',
+                              mr: 1.5,
+                              fontWeight: 600,
+                            }}
+                          >
+                            •
+                          </Box>
+                          <ListItemText 
+                            primary={item} 
+                            primaryTypographyProps={{ fontWeight: 500 }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </CardContent>
+                  <CardActions sx={{ p: 3, pt: 0 }}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color={feature.color as any}
+                      component={Link}
+                      href={feature.href}
+                      sx={{
+                        py: 1.5,
+                        fontWeight: 600,
+                        borderRadius: 2,
+                      }}
+                    >
+                      开始使用
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* Tech Specs Section - 显示微妙的粒子效果 */}
+      <Box sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth="lg" sx={{ py: 8 }}>
+          <Paper 
+            sx={{ 
+              p: 6,
+              border: '1px solid rgba(0, 255, 136, 0.1)',
+              background: 'linear-gradient(145deg, rgba(26, 26, 26, 0.8) 0%, rgba(42, 42, 42, 0.8) 100%)',
+              backdropFilter: 'blur(10px)', // 毛玻璃效果
+            }}
+          >
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <Box 
                 sx={{ 
-                  height: '100%',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
-                  },
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 80,
+                  height: 80,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(42, 42, 42, 0.8) 0%, rgba(58, 58, 58, 0.8) 100%)',
+                  color: '#00FF88',
+                  mb: 2,
+                  border: '1px solid rgba(0, 255, 136, 0.3)',
                 }}
               >
-                <CardContent sx={{ p: 4 }}>
-                  <Box 
-                    sx={{ 
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: 80,
-                      height: 80,
-                      borderRadius: 3,
-                      background: 'linear-gradient(135deg, #2A2A2A 0%, #3A3A3A 100%)',
-                      color: '#00FF88', // 图标颜色改为科技绿色
-                      mb: 3,
-                      mx: 'auto',
-                      border: '1px solid rgba(0, 255, 136, 0.3)',
-                    }}
-                  >
-                    {feature.icon}
-                  </Box>
-                  <Typography variant="h5" component="h3" gutterBottom align="center" fontWeight={600}>
-                    {feature.title}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary" paragraph align="center">
-                    {feature.description}
-                  </Typography>
-                  <List dense>
-                    {feature.features.map((item) => (
-                      <ListItem key={item} sx={{ px: 0 }}>
-                        <Box 
-                          component="span" 
-                          sx={{ 
-                            color: '#00FF88', // 列表项圆点改为科技绿色
-                            mr: 1.5,
-                            fontWeight: 600,
-                          }}
-                        >
-                          •
-                        </Box>
-                        <ListItemText 
-                          primary={item} 
-                          primaryTypographyProps={{ fontWeight: 500 }}
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                </CardContent>
-                <CardActions sx={{ p: 3, pt: 0 }}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color={feature.color as any}
-                    component={Link}
-                    href={feature.href}
-                    sx={{
-                      py: 1.5,
-                      fontWeight: 600,
-                      borderRadius: 2,
-                    }}
-                  >
-                    开始使用
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-
-      {/* Tech Specs Section */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
-        <Paper 
-          sx={{ 
-            p: 6,
-            border: '1px solid rgba(0, 255, 136, 0.1)',
-            background: 'linear-gradient(145deg, #1A1A1A 0%, #2A2A2A 100%)',
-          }}
-        >
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Box 
-              sx={{ 
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 80,
-                height: 80,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #2A2A2A 0%, #3A3A3A 100%)',
-                color: '#00FF88', // 图标颜色改为科技绿色
-                mb: 2,
-                border: '1px solid rgba(0, 255, 136, 0.3)',
-              }}
-            >
-              <TrendingUpIcon sx={{ fontSize: 40 }} />
+                <TrendingUpIcon sx={{ fontSize: 40 }} />
+              </Box>
+              <Typography variant="h4" component="h2" gutterBottom fontWeight={700}>
+                技术规格
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                基于先进的数据分析和机器学习技术
+              </Typography>
             </Box>
-            <Typography variant="h4" component="h2" gutterBottom fontWeight={700}>
-              技术规格
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              基于先进的数据分析和机器学习技术
-            </Typography>
-          </Box>
 
-          <Grid container spacing={4}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Typography variant="h6" gutterBottom sx={{ color: '#00FF88' }} fontWeight={600}>
-                📊 数据来源
-              </Typography>
-              <List>
-                <ListItem sx={{ px: 0 }}>
-                  <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
-                  <ListItemText
-                    primary="Uniswap V3"
-                    secondary="池地址：0x11b815efB8f581194ae79006d24E0d814B7697F6"
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                    secondaryTypographyProps={{ fontWeight: 500 }}
-                  />
-                </ListItem>
-                <ListItem sx={{ px: 0 }}>
-                  <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
-                  <ListItemText
-                    primary="Binance"
-                    secondary="交易对：ETHUSDT，实时市场数据"
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                    secondaryTypographyProps={{ fontWeight: 500 }}
-                  />
-                </ListItem>
-                <ListItem sx={{ px: 0 }}>
-                  <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
-                  <ListItemText
-                    primary="Dune Analytics"
-                    secondary="链上交易数据分析与可视化"
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                    secondaryTypographyProps={{ fontWeight: 500 }}
-                  />
-                </ListItem>
-              </List>
-            </Grid>
+            <Grid container spacing={4}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: '#00FF88' }} fontWeight={600}>
+                  📊 数据来源
+                </Typography>
+                <List>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="Uniswap V3"
+                      secondary="池地址：0x11b815efB8f581194ae79006d24E0d814B7697F6"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="Binance"
+                      secondary="交易对：ETHUSDT，实时市场数据"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="Dune Analytics"
+                      secondary="链上交易数据分析与可视化"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                </List>
+              </Grid>
 
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Typography variant="h6" gutterBottom sx={{ color: '#00FF88' }} fontWeight={600}>
-                ⚡ 技术特性
-              </Typography>
-              <List>
-                <ListItem sx={{ px: 0 }}>
-                  <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
-                  <ListItemText
-                    primary="实时数据处理"
-                    secondary="毫秒级数据更新与处理能力"
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                    secondaryTypographyProps={{ fontWeight: 500 }}
-                  />
-                </ListItem>
-                <ListItem sx={{ px: 0 }}>
-                  <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
-                  <ListItemText
-                    primary="智能算法检测"
-                    secondary="基于机器学习的套利机会识别"
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                    secondaryTypographyProps={{ fontWeight: 500 }}
-                  />
-                </ListItem>
-                <ListItem sx={{ px: 0 }}>
-                  <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
-                  <ListItemText
-                    primary="可视化分析"
-                    secondary="交互式图表与数据可视化"
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                    secondaryTypographyProps={{ fontWeight: 500 }}
-                  />
-                </ListItem>
-              </List>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: '#00FF88' }} fontWeight={600}>
+                  ⚡ 技术特性
+                </Typography>
+                <List>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="实时数据处理"
+                      secondary="毫秒级数据更新与处理能力"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="智能算法检测"
+                      secondary="基于机器学习的套利机会识别"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="可视化分析"
+                      secondary="交互式图表与数据可视化"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                </List>
+              </Grid>
             </Grid>
-          </Grid>
-        </Paper>
-      </Container>
+          </Paper>
+        </Container>
+      </Box>
     </Box>
   );
 }

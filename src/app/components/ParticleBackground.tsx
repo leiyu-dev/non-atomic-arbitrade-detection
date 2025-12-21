@@ -32,23 +32,25 @@ const ParticleBackground: React.FC = () => {
 
     // 创建粒子数组
     const particles: Particle[] = [];
-    const particleCount = 200; // 增加粒子数量以获得更细密的效果
+    const particleCount = 300; // 增加粒子数量
 
     // 初始化粒子
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 0.5 + 0.1, // 非常小的粒子尺寸 (0.1px - 0.6px)
-        speedX: (Math.random() - 0.5) * 0.3, // 缓慢移动
-        speedY: (Math.random() - 0.5) * 0.3,
-        opacity: Math.random() * 0.3 + 0.1, // 低透明度
+        size: Math.random() * 1.5 + 0.5, // 增大粒子尺寸 (0.5px - 2.0px)
+        speedX: (Math.random() - 0.5) * 0.8, // 加快移动速度
+        speedY: (Math.random() - 0.5) * 0.8,
+        opacity: Math.random() * 0.5 + 0.3, // 增加透明度
       });
     }
 
     // 动画循环
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // 使用半透明清除，创建拖尾效果
+      ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // 更新和绘制每个粒子
       particles.forEach((particle, index) => {
@@ -65,7 +67,7 @@ const ParticleBackground: React.FC = () => {
         // 绘制粒子
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${particle.opacity})`; // 白色粒子
+        ctx.fillStyle = `rgba(255, 255, 255, ${particle.opacity})`;
         ctx.fill();
 
         // 绘制粒子间的连线（创建科技感网格效果）
@@ -75,10 +77,10 @@ const ParticleBackground: React.FC = () => {
           const distance = Math.sqrt(dx * dx + dy * dy);
 
           // 只在近距离粒子间绘制连线
-          if (distance < 100) {
+          if (distance < 150) { // 增加连线距离
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(255, 255, 255, ${0.1 * (1 - distance / 100)})`;
-            ctx.lineWidth = 0.1;
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * (1 - distance / 150)})`;
+            ctx.lineWidth = 0.3; // 增加连线宽度
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();
@@ -105,8 +107,9 @@ const ParticleBackground: React.FC = () => {
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: -1, // 确保在内容层底下
-        pointerEvents: 'none', // 不干扰用户交互
+        zIndex: -1,
+        pointerEvents: 'none',
+        background: 'transparent', // 确保canvas背景透明
       }}
     />
   );

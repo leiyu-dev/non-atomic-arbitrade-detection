@@ -19,19 +19,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" > 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </head>
-      <body style={{ position: 'relative' }}>
+      <body style={{ position: 'relative', background: 'transparent' }}> {/* body背景透明 */}
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
             {/* 粒子背景 - 显示在导航栏和内容底下 */}
             <ParticleBackground />
             <Navigation />
-            <main style={{ position: 'relative', zIndex: 1 }}>
+            <main style={{ position: 'relative', zIndex: 1, background: 'transparent' }}>
               {children}
             </main>
           </ThemeProvider>
