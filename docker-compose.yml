@@ -18,7 +18,7 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
-    command: ["sh", "-c", "mkdir -p /app/public/uploads /app/public/thumbnails /app/data /app/logs && npx prisma migrate deploy && node server.js"]
+    command: ["sh", "-c", "mkdir -p /app/public /app/public/data /app/data && npx prisma migrate deploy && node server.js"]
 
 volumes:
   db:

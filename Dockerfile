@@ -53,7 +53,7 @@ RUN mkdir -p /app/public /app/public/data /app/data && \
     chmod -R 755 /app/public /app/data
 
 # 切换到非 root 用户
-# USER nextjs
+USER nextjs
 
 # 暴露端口
 EXPOSE 3000
