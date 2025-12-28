@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Uniswap V3 交易数据
+model UniswapTrade {
+  id              String   @id @default(uuid())
+  transactionHash String   @unique
+  blockNumber     Int
+  timestamp       DateTime
+  poolAddress     String
+  token0Amount    Float
+  token1Amount    Float
+  priceUSDT       Float    // ETH 价格（USDT计价）
+  sender          String
+  recipient       String
+  createdAt       DateTime @default(now())
+  
+  @@index([timestamp])
+  @@index([poolAddress])
+}
+
+// Binance 交易数据
+model BinanceTrade {
+  id        String   @id @default(uuid())
+  tradeId   String   @unique
+  timestamp DateTime
+  symbol    String   // ETHUSDT
+  price     Float    // ETH 价格（USDT计价）
+  quantity  Float    // ETH 数量
+  isBuyerMaker Boolean
+  createdAt DateTime @default(now())
+  
+  @@index([timestamp])
+  @@index([symbol])
+}
+
+// 检测到的套利机会（原有模型保留以兼容）
+model ArbitrageOpportunity {
+  id                  String   @id @default(uuid())
+  timestamp           DateTime
+  uniswapPrice        Float
+  binancePrice        Float
+  priceDifference     Float    // 价格差异
+  priceDifferencePercent Float // 价格差异百分比
+  potentialProfitUSDT Float    // 潜在利润（USDT）
+  tradeAmount         Float    // 交易金额（ETH）
+  direction           String   // "buy_uniswap_sell_binance" 或 "buy_binance_sell_uniswap"
+  createdAt           DateTime @default(now())
+  
+  @@index([timestamp])
+}
+
+// CEX-DEX 套利行为识别（基于论文 2507.13023v3）
+model CexDexArbitrage {
+  id                    String   @id @default(uuid())
+  
+  // 交易基本信息
+  txHash                String   @unique
+  blockNumber           Int
+  blockTime             DateTime
+  txIndex               Int
+  
+  // 地址信息
+  fromAddr              String   // 发起地址
+  toAddr                String   // 目标合约地址
+  taker                 String   // 实际执行者地址
+  mevBotLabel           String?  // MEV Bot 标签（如果已识别）
+  
+  // Gas 和费用信息
+  baseFees              Float    // 基础费用 (ETH)
+  priorityFees          Float    // 优先费用 (ETH)
+  cbTransfer            Float    // Coinbase 转账 (ETH)
+  
+  // MEV 价值
+  mevValue              Float    // MEV 提取价值 (ETH)
+  volume                Float    // 交易量 (USD)
+  
+  // 代币信息
+  tokenBoughtSymbol     String
+  tokenSoldSymbol       String
+  tokenBoughtContract   String
+  tokenSoldContract     String
+  tokenBoughtAmount     Float
+  tokenSoldAmount       Float
+  pair                  String   // 交易对，例如: USDT-WETH
+  
+  // 其他信息
+  multiTrade            Int      // 是否为多笔交易 (0/1)
+  
+  // 来自 Dune 的元数据
+  duneQueryId           Int?     // Dune 查询 ID
+  duneDataFetched       Boolean  @default(false)
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@index([blockTime])
+  @@index([fromAddr])
+  @@index([taker])
+  @@index([blockNumber])  
+  @@index([pair])
+}
