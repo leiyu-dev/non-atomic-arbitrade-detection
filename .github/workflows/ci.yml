@@ -77,8 +77,8 @@ jobs:
 
   docker-build:
     runs-on: ubuntu-latest
-    # 只在 main 和 develop 分支的 push 事件时运行（跳过 PR，因为可能没有权限）
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    # 只在 main 分支的 push/PR 事件时运行
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
 
     steps:
       - name: 检出代码
