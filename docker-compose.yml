@@ -1,0 +1,25 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: non-atomic-arbitrade-detection
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/dev.db
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+    volumes:
+      # 持久化数据库文件
+      - db:/app/data
+      # 持久化数据
+      - ./public:/app/public
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    command: ["sh", "-c", "mkdir -p /app/public /app/public/data /app/data && npx prisma migrate deploy && node server.js"]
+
+volumes:
+  db:
+    driver: local

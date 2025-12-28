@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 验证 package-lock.json
+        run: |
+          if ! npm ci --dry-run; then
+            echo "错误: package-lock.json 与 package.json 不同步"
+            exit 1
+          fi
+          echo "package-lock.json 验证通过"
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 验证环境变量文件
+        run: |
+          if [ ! -f "env.example" ]; then
+            echo "警告: env.example 文件不存在"
+          else
+            echo "env.example 文件存在"
+          fi
+
+      - name: 生成 Prisma Client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: "file:./prisma/test.db"
+
+      - name: 验证 Prisma Schema
+        run: npx prisma validate
+        env:
+          DATABASE_URL: "file:./prisma/test.db"
+
+      - name: TypeScript 类型检查
+        run: npx tsc --noEmit
+
+      - name: 构建项目
+        run: npm run build
+        env:
+          DATABASE_URL: "file:./prisma/test.db"
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: 检查构建产物
+        run: |
+          if [ ! -d ".next" ]; then
+            echo "错误: .next 目录不存在，构建可能失败"
+            exit 1
+          fi
+          if [ ! -d ".next/standalone" ]; then
+            echo "错误: .next/standalone 目录不存在，standalone 构建可能失败"
+            exit 1
+          fi
+          echo "构建成功，.next 目录已生成"
+
+  docker-build:
+    runs-on: ubuntu-latest
+    # 只在 main 分支的 push/PR 事件时运行
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 构建 Docker 镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: non-atomic-arbitrage:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            DATABASE_URL=file:./prisma/test.db
+
