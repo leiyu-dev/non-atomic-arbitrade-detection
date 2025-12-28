@@ -16,7 +16,7 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Chip,
+Chip,
   CircularProgress,
   Alert,
   TextField,
@@ -171,16 +171,26 @@ export default function CexDexAnalysisPage() {
       title: {
         text: 'MEV 价值时间趋势',
         left: 'center',
+        textStyle: {
+          color: '#FFFFFF', // 标题文字改为白色
+        },
       },
       tooltip: {
         trigger: 'axis',
         axisPointer: {
           type: 'cross',
         },
+        textStyle: {
+          color: '#FFFFFF', // 提示文字改为白色
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
       },
       legend: {
         data: ['每日 MEV 价值 (ETH)', '交易数量'],
         top: 40,
+        textStyle: {
+          color: '#FFFFFF', // 图例文字改为白色
+        },
       },
       grid: {
         left: '5%',
@@ -195,6 +205,12 @@ export default function CexDexAnalysisPage() {
         data: sortedDates,
         axisLabel: {
           rotate: 45,
+          color: '#FFFFFF', // X轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // X轴线改为白色
+          },
         },
       },
       yAxis: [
@@ -202,11 +218,33 @@ export default function CexDexAnalysisPage() {
           type: 'value',
           name: 'MEV 价值 (ETH)',
           position: 'left',
+          axisLabel: {
+            color: '#FFFFFF', // Y轴标签改为白色
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#FFFFFF', // Y轴线改为白色
+            },
+          },
+          nameTextStyle: {
+            color: '#FFFFFF', // 轴名称改为白色
+          },
         },
         {
           type: 'value',
           name: '交易数量',
           position: 'right',
+          axisLabel: {
+            color: '#FFFFFF', // Y轴标签改为白色
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#FFFFFF', // Y轴线改为白色
+            },
+          },
+          nameTextStyle: {
+            color: '#FFFFFF', // 轴名称改为白色
+          },
         },
       ],
       series: [
@@ -227,10 +265,10 @@ export default function CexDexAnalysisPage() {
           type: 'bar',
           yAxisIndex: 1,
           data: counts,
-          itemStyle: {
+itemStyle: {
             color: '#2196f3',
           },
-        },
+},
       ],
     };
   };
@@ -256,12 +294,19 @@ export default function CexDexAnalysisPage() {
       title: {
         text: '每日交易量趋势',
         left: 'center',
+        textStyle: {
+          color: '#FFFFFF', // 标题文字改为白色
+        },
       },
       tooltip: {
         trigger: 'axis',
         formatter: (params: any) => {
           return `${params[0].name}<br/>交易量: $${(parseFloat(params[0].value) * 1000).toLocaleString()} USD`;
         },
+        textStyle: {
+          color: '#FFFFFF', // 提示文字改为白色
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
       },
       grid: {
         left: '5%',
@@ -275,11 +320,28 @@ export default function CexDexAnalysisPage() {
         data: sortedDates,
         axisLabel: {
           rotate: 45,
+          color: '#FFFFFF', // X轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // X轴线改为白色
+          },
         },
       },
       yAxis: {
         type: 'value',
         name: '交易量 (K USD)',
+        axisLabel: {
+          color: '#FFFFFF', // Y轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // Y轴线改为白色
+          },
+        },
+        nameTextStyle: {
+          color: '#FFFFFF', // 轴名称改为白色
+        },
       },
       series: [
         {
@@ -312,6 +374,9 @@ export default function CexDexAnalysisPage() {
       title: {
         text: 'Top 套利者 MEV 价值分布',
         left: 'center',
+        textStyle: {
+          color: '#FFFFFF', // 标题文字改为白色
+        },
       },
       tooltip: {
         trigger: 'axis',
@@ -323,10 +388,17 @@ export default function CexDexAnalysisPage() {
           const searcher = statistics.topSearchers[index];
           return `${searcher.name}<br/>地址: ${searcher.address}<br/>MEV 价值: ${params[0].value} ETH<br/>交易数量: ${params[1].value}`;
         },
+        textStyle: {
+          color: '#FFFFFF', // 提示文字改为白色
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
       },
       legend: {
         data: ['MEV 价值 (ETH)', '交易数量'],
         top: 40,
+        textStyle: {
+          color: '#FFFFFF', // 图例文字改为白色
+        },
       },
       grid: {
         left: '5%',
@@ -341,6 +413,12 @@ export default function CexDexAnalysisPage() {
         axisLabel: {
           interval: 0,
           rotate: 45,
+          color: '#FFFFFF', // X轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // X轴线改为白色
+          },
         },
       },
       yAxis: [
@@ -348,16 +426,38 @@ export default function CexDexAnalysisPage() {
           type: 'value',
           name: 'MEV 价值 (ETH)',
           position: 'left',
+          axisLabel: {
+            color: '#FFFFFF', // Y轴标签改为白色
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#FFFFFF', // Y轴线改为白色
+            },
+          },
+          nameTextStyle: {
+            color: '#FFFFFF', // 轴名称改为白色
+          },
         },
         {
           type: 'value',
           name: '交易数量',
           position: 'right',
+          axisLabel: {
+            color: '#FFFFFF', // Y轴标签改为白色
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#FFFFFF', // Y轴线改为白色
+            },
+          },
+          nameTextStyle: {
+            color: '#FFFFFF', // 轴名称改为白色
+          },
         },
       ],
       series: [
         {
-          name: 'MEV 价值 (ETH)',
+name: 'MEV 价值 (ETH)',
           type: 'bar',
           data: mevValues,
           itemStyle: {
@@ -418,7 +518,7 @@ export default function CexDexAnalysisPage() {
         left: '5%',
         right: '5%',
         bottom: '15%',
-        top: '20%',
+top: '20%',
         containLabel: true,
       },
       xAxis: {
@@ -466,7 +566,7 @@ export default function CexDexAnalysisPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 4, mt: 8 }}>
         <Typography variant="h4" component="h1" gutterBottom>
           CEX-DEX 套利行为识别
         </Typography>
@@ -517,7 +617,7 @@ export default function CexDexAnalysisPage() {
               </Box>
             </Grid>
           </Grid>
-        </CardContent>
+           </CardContent>
       </Card>
 
       {/* 错误提示 */}
@@ -530,75 +630,76 @@ export default function CexDexAnalysisPage() {
       {/* 统计信息卡片 */}
       {statistics && (
         <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <ReceiptIcon sx={{ mr: 1, color: 'primary.main' }} />
-                  <Typography variant="h6">总交易数</Typography>
-                </Box>
-                <Typography variant="h4">
-                  {statistics.totalTransactions.toLocaleString()}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <TrendingUpIcon sx={{ mr: 1, color: 'success.main' }} />
-                  <Typography variant="h6">总 MEV 价值</Typography>
-                </Box>
-                <Typography variant="h4" color="success.main">
-                  {statistics.totalMevValueETH.toLocaleString(undefined, {
-                    minimumFractionDigits: 4,
-                    maximumFractionDigits: 4,
-                  })} ETH
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <AttachMoneyIcon sx={{ mr: 1, color: 'info.main' }} />
-                  <Typography variant="h6">总交易量</Typography>
-                </Box>
-                <Typography variant="h4" color="info.main">
-                  ${statistics.totalVolumeUSD.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <PeopleIcon sx={{ mr: 1, color: 'warning.main' }} />
-                  <Typography variant="h6">套利者数量</Typography>
-                </Box>
-                <Typography variant="h4">
-                  {statistics.uniqueSearchers}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+          {[
+            { 
+              title: '总交易数', 
+              value: statistics.totalTransactions.toLocaleString(), 
+              icon: <ReceiptIcon sx={{ mr: 1, color: 'primary.main' }} />,
+              color: 'primary'
+            },
+            { 
+              title: '总 MEV 价值', 
+              value: `${statistics.totalMevValueETH.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ETH`, 
+              icon: <TrendingUpIcon sx={{ mr: 1, color: 'success.main' }} />,
+              color: 'success'
+            },
+            { 
+              title: '总交易量', 
+              value: `$${statistics.totalVolumeUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 
+              icon: <AttachMoneyIcon sx={{ mr: 1, color: 'info.main' }} />,
+              color: 'info'
+            },
+            { 
+              title: '套利者数量', 
+              value: statistics.uniqueSearchers.toString(), 
+              icon: <PeopleIcon sx={{ mr: 1, color: 'warning.main' }} />,
+              color: 'warning'
+            }
+          ].map((item, index) => (
+            <Grid key={item.title} size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card sx={{ 
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+                },
+              }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    {item.icon}
+                    <Typography variant="h6">{item.title}</Typography>
+                  </Box>
+                  <Typography variant="h4" color={`${item.color}.main`}>
+                    {item.value}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
       )}
 
       {/* Top 套利者 */}
       {statistics && statistics.topSearchers.length > 0 && (
-        <Card sx={{ mb: 4 }}>
+        <Card sx={{ 
+          mb: 4,
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+          },
+        }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
               Top 套利者排行
             </Typography>
-            <TableContainer>
+            <TableContainer sx={{ 
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 10px 20px rgba(0, 255, 136, 0.15)',
+              },
+            }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -612,7 +713,7 @@ export default function CexDexAnalysisPage() {
                 </TableHead>
                 <TableBody>
                   {statistics.topSearchers.map((searcher, index) => (
-                    <TableRow key={searcher.address}>
+                    <TableRow key={searcher.address} hover>
                       <TableCell>
                         <Chip 
                           label={`#${index + 1}`} 
@@ -673,7 +774,14 @@ export default function CexDexAnalysisPage() {
           <Grid container spacing={3} sx={{ mb: 4 }}>
             {/* MEV 价值时间趋势 */}
             <Grid size={{ xs: 12, lg: 6 }}>
-              <Paper sx={{ p: 2 }}>
+              <Paper sx={{ 
+                p: 2,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+                },
+              }}>
                 <ReactECharts
                   option={getMevTimelineChartOption()}
                   style={{ height: '400px' }}
@@ -683,7 +791,14 @@ export default function CexDexAnalysisPage() {
 
             {/* 交易量时间趋势 */}
             <Grid size={{ xs: 12, lg: 6 }}>
-              <Paper sx={{ p: 2 }}>
+              <Paper sx={{ 
+                p: 2,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+                },
+              }}>
                 <ReactECharts
                   option={getVolumeTimelineChartOption()}
                   style={{ height: '400px' }}
@@ -692,22 +807,17 @@ export default function CexDexAnalysisPage() {
             </Grid>
 
             {/* Top 套利者柱状图 */}
-            {statistics && statistics.topSearchers.length > 0 && (
-              <Grid size={{ xs: 12 }}>
-                <Paper sx={{ p: 2 }}>
-                  <ReactECharts
-                    option={getTopSearchersChartOption()}
-                    style={{ height: '400px' }}
-                  />
-                </Paper>
-              </Grid>
-            )}
-
-            {/* Gas 费用分析 */}
             <Grid size={{ xs: 12 }}>
-              <Paper sx={{ p: 2 }}>
+              <Paper sx={{ 
+                p: 2,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+                },
+              }}>
                 <ReactECharts
-                  option={getGasAnalysisChartOption()}
+                  option={getTopSearchersChartOption()}
                   style={{ height: '400px' }}
                 />
               </Paper>
@@ -717,11 +827,11 @@ export default function CexDexAnalysisPage() {
       )}
 
       {/* 套利交易列表 */}
-      <Card>
+      <Card sx={{ mt: 4 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
             <Typography variant="h6">
-              套利交易列表 (显示 {Math.min(limit, arbitrages.length)} / 总共 {arbitrages.length} 条)
+              📋 套利交易列表
             </Typography>
             <TextField
               type="number"
@@ -742,7 +852,14 @@ export default function CexDexAnalysisPage() {
               暂无数据，请点击"获取最新数据"按钮从 data/data1-4.csv 文件加载数据
             </Alert>
           ) : (
-            <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+            <TableContainer component={Paper} sx={{ 
+              maxHeight: 600,
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+              },
+            }}>
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
@@ -802,4 +919,3 @@ export default function CexDexAnalysisPage() {
     </Container>
   );
 }
-

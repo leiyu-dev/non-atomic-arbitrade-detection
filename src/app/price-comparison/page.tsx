@@ -142,6 +142,9 @@ export default function PriceComparisonPage() {
       title: {
         text: 'Uniswap V3 vs Binance ETH/USDT 价格对比',
         left: 'center',
+        textStyle: {
+          color: '#FFFFFF', // 标题文字改为白色
+        },
       },
       tooltip: {
         trigger: 'axis',
@@ -157,10 +160,17 @@ export default function PriceComparisonPage() {
           });
           return result;
         },
+        textStyle: {
+          color: '#FFFFFF', // 提示文字改为白色
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
       },
       legend: {
         data: ['Uniswap V3', 'Binance'],
         top: 30,
+        textStyle: {
+          color: '#FFFFFF', // 图例文字改为白色
+        },
       },
       grid: {
         left: '3%',
@@ -176,6 +186,12 @@ export default function PriceComparisonPage() {
           formatter: (value: string) => {
             return format(new Date(value), 'MM-dd HH:mm');
           },
+          color: '#FFFFFF', // X轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // X轴线改为白色
+          },
         },
       },
       yAxis: {
@@ -183,6 +199,15 @@ export default function PriceComparisonPage() {
         name: '价格 (USDT)',
         axisLabel: {
           formatter: '${value}',
+          color: '#FFFFFF', // Y轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // Y轴线改为白色
+          },
+        },
+        nameTextStyle: {
+          color: '#FFFFFF', // 轴名称改为白色
         },
       },
       series: [
@@ -265,7 +290,7 @@ export default function PriceComparisonPage() {
   const statistics = getStatistics();
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4, mt: 8 }}>
       <Typography variant="h3" component="h1" gutterBottom align="center">
         价格对比分析
       </Typography>
@@ -297,10 +322,17 @@ export default function PriceComparisonPage() {
         </Alert>
       )}
 
+      {/* 统计信息卡片 */}
       {statistics && (
-        <Grid container spacing={3} sx={{ mb: 3 }}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card>
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Card sx={{ 
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+              },
+            }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom color="primary">
                   Uniswap V3 统计
@@ -321,8 +353,14 @@ export default function PriceComparisonPage() {
             </Card>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Card sx={{ 
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+              },
+            }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom color="secondary">
                   Binance 统计
@@ -344,7 +382,13 @@ export default function PriceComparisonPage() {
           </Grid>
 
           <Grid size={{ xs: 12 }}>
-            <Card>
+            <Card sx={{ 
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+              },
+            }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   价格差异
@@ -359,8 +403,16 @@ export default function PriceComparisonPage() {
         </Grid>
       )}
 
+      {/* 图表 */}
       {tradeData && (
-        <Paper sx={{ p: 2 }}>
+        <Paper sx={{ 
+          p: 2,
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+          },
+        }}>
           <ReactECharts
             option={getPriceComparisonChartOption()}
             style={{ height: '500px' }}
@@ -369,7 +421,15 @@ export default function PriceComparisonPage() {
       )}
 
       {!tradeData && !loading && (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
+        <Paper sx={{ 
+          p: 4, 
+          textAlign: 'center',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+          },
+        }}>
           <Typography variant="h6" color="text.secondary">
             暂无数据，请点击"重新获取数据"按钮
           </Typography>
@@ -378,4 +438,3 @@ export default function PriceComparisonPage() {
     </Container>
   );
 }
-

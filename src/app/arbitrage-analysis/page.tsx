@@ -48,12 +48,12 @@ interface ArbitrageOpportunity {
 
 export default function ArbitrageAnalysisPage() {
   const [loading, setLoading] = useState(false);
-  const [detecting, setDetecting] = useState(false);
+const [detecting, setDetecting] = useState(false);
   const [statistics, setStatistics] = useState<ArbitrageStatistics | null>(null);
   const [opportunities, setOpportunities] = useState<ArbitrageOpportunity[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // 检测参数
+// 检测参数
   const [params, setParams] = useState({
     tradeAmountETH: 1,
     tradingFeePercent: 0.1,
@@ -141,6 +141,9 @@ export default function ArbitrageAnalysisPage() {
       title: {
         text: '套利利润时间分布',
         left: 'center',
+        textStyle: {
+          color: '#FFFFFF', // 标题文字改为白色
+        },
       },
       tooltip: {
         trigger: 'axis',
@@ -149,16 +152,40 @@ export default function ArbitrageAnalysisPage() {
           const profit = params[0].value[1].toFixed(2);
           return `${date}<br/>潜在利润: $${profit}`;
         },
+        textStyle: {
+          color: '#FFFFFF', // 提示文字改为白色
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
       },
       xAxis: {
         type: 'time',
         name: '时间',
+        axisLabel: {
+          color: '#FFFFFF', // X轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // X轴线改为白色
+          },
+        },
+        nameTextStyle: {
+          color: '#FFFFFF', // 轴名称改为白色
+        },
       },
       yAxis: {
         type: 'value',
         name: '利润 (USDT)',
         axisLabel: {
           formatter: '${value}',
+          color: '#FFFFFF', // Y轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // Y轴线改为白色
+          },
+        },
+        nameTextStyle: {
+          color: '#FFFFFF', // 轴名称改为白色
         },
       },
       series: [
@@ -203,26 +230,54 @@ export default function ArbitrageAnalysisPage() {
     });
 
     const categories = bins.slice(0, -1).map((bin, i) => `${bin}-${bins[i + 1]}%`);
-
-    return {
+return {
       title: {
         text: '价格差异分布',
         left: 'center',
+        textStyle: {
+          color: '#FFFFFF', // 标题文字改为白色
+        },
       },
       tooltip: {
         trigger: 'axis',
         axisPointer: {
           type: 'shadow',
         },
+        textStyle: {
+          color: '#FFFFFF', // 提示文字改为白色
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
       },
       xAxis: {
         type: 'category',
         data: categories,
         name: '价格差异百分比',
+        axisLabel: {
+          color: '#FFFFFF', // X轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // X轴线改为白色
+          },
+        },
+        nameTextStyle: {
+          color: '#FFFFFF', // 轴名称改为白色
+        },
       },
       yAxis: {
         type: 'value',
         name: '机会数量',
+        axisLabel: {
+          color: '#FFFFFF', // Y轴标签改为白色
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#FFFFFF', // Y轴线改为白色
+          },
+        },
+        nameTextStyle: {
+color: '#FFFFFF', // 轴名称改为白色
+        },
       },
       series: [
         {
@@ -245,15 +300,25 @@ export default function ArbitrageAnalysisPage() {
       title: {
         text: '套利方向分布',
         left: 'center',
+        textStyle: {
+          color: '#FFFFFF', // 标题文字改为白色
+        },
       },
       tooltip: {
         trigger: 'item',
         formatter: '{b}: {c} ({d}%)',
+        textStyle: {
+          color: '#FFFFFF', // 提示文字改为白色
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
       },
       legend: {
         orient: 'vertical',
         left: 'left',
         top: 'center',
+        textStyle: {
+          color: '#FFFFFF', // 图例文字改为白色
+        },
       },
       series: [
         {
@@ -285,11 +350,11 @@ export default function ArbitrageAnalysisPage() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom align="center">
-        非原子套利分析
-      </Typography>
-
+    <Container maxWidth="xl" sx={{ py: 4 , mt: 8}}>
+        <Typography variant="h3" component="h1" gutterBottom align="center">
+          非原子套利分析
+        </Typography>
+      
       <Typography variant="subtitle1" gutterBottom align="center" color="text.secondary">
         分析时间段：2025年9月1日 - 9月30日
       </Typography>
@@ -360,84 +425,33 @@ export default function ArbitrageAnalysisPage() {
       {/* 统计信息 */}
       {statistics && (
         <Grid container spacing={3} sx={{ mb: 3 }}>
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
-                  套利机会总数
-                </Typography>
-                <Typography variant="h4">{statistics.totalOpportunities}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" color="success.main" gutterBottom>
-                  总潜在利润
-                </Typography>
-                <Typography variant="h4">
-                  ${statistics.totalPotentialProfit.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" color="info.main" gutterBottom>
-                  平均单次利润
-                </Typography>
-                <Typography variant="h4">
-                  ${statistics.averageProfitPerOpportunity.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card>
-              <CardContent>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  最大单次利润
-                </Typography>
-                <Typography variant="h5">
-                  ${statistics.maxProfit.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card>
-              <CardContent>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  最小单次利润
-                </Typography>
-                <Typography variant="h5">
-                  ${statistics.minProfit.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card>
-              <CardContent>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  套利方向分布
-                </Typography>
-                <Typography variant="body1">
-                  买入 Uniswap: {statistics.buyUniswapCount}
-                </Typography>
-                <Typography variant="body1">
-                  买入 Binance: {statistics.buyBinanceCount}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+          {[
+            { title: '套利机会总数', value: statistics.totalOpportunities, color: 'primary' },
+            { title: '总潜在利润', value: `$${statistics.totalPotentialProfit.toFixed(2)}`, color: 'success' },
+            { title: '平均单次利润', value: `$${statistics.averageProfitPerOpportunity.toFixed(2)}`, color: 'info' },
+            { title: '最大单次利润', value: `$${statistics.maxProfit.toFixed(2)}`, color: 'text.secondary' },
+            { title: '最小单次利润', value: `$${statistics.minProfit.toFixed(2)}`, color: 'text.secondary' },
+            { title: '套利方向分布', value: `买U: ${statistics.buyUniswapCount} 买B: ${statistics.buyBinanceCount}`, color: 'text.secondary' }
+          ].map((item, index) => (
+            <Grid key={item.title} size={{ xs: 12, sm: 6, md: 4 }}>
+              <Card sx={{ 
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+                },
+              }}>
+                <CardContent>
+                  <Typography variant={index < 3 ? "h6" : "body2"} color={item.color} gutterBottom>
+                    {item.title}
+                  </Typography>
+                  <Typography variant={index < 3 ? "h4" : "h5"}>
+                    {item.value}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
       )}
 
@@ -445,7 +459,14 @@ export default function ArbitrageAnalysisPage() {
       {opportunities.length > 0 && (
         <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid size={{ xs: 12, lg: 6 }}>
-            <Paper sx={{ p: 2 }}>
+            <Paper sx={{ 
+              p: 2,
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+              },
+            }}>
               <ReactECharts
                 option={getProfitTimelineChartOption()}
                 style={{ height: '400px' }}
@@ -454,7 +475,14 @@ export default function ArbitrageAnalysisPage() {
           </Grid>
 
           <Grid size={{ xs: 12, lg: 6 }}>
-            <Paper sx={{ p: 2 }}>
+            <Paper sx={{ 
+              p: 2,
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+              },
+            }}>
               <ReactECharts
                 option={getPriceDifferenceChartOption()}
                 style={{ height: '400px' }}
@@ -463,7 +491,14 @@ export default function ArbitrageAnalysisPage() {
           </Grid>
 
           <Grid size={{ xs: 12 }}>
-            <Paper sx={{ p: 2 }}>
+            <Paper sx={{ 
+              p: 2,
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+              },
+            }}>
               <ReactECharts
                 option={getDirectionPieChartOption()}
                 style={{ height: '400px' }}
@@ -475,11 +510,24 @@ export default function ArbitrageAnalysisPage() {
 
       {/* 套利机会列表 */}
       {opportunities.length > 0 && (
-        <Paper sx={{ p: 2 }}>
+        <Paper sx={{ 
+          p: 2,
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+          },
+        }}>
           <Typography variant="h6" gutterBottom>
             套利机会详情
           </Typography>
-          <TableContainer>
+          <TableContainer sx={{ 
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-4px)',
+              boxShadow: '0 10px 20px rgba(0, 255, 136, 0.15)',
+            },
+          }}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -493,7 +541,7 @@ export default function ArbitrageAnalysisPage() {
               </TableHead>
               <TableBody>
                 {opportunities.slice(0, 50).map(opp => (
-                  <TableRow key={opp.id}>
+                  <TableRow key={opp.id} hover>
                     <TableCell>
                       {format(new Date(opp.timestamp), 'yyyy-MM-dd HH:mm:ss')}
                     </TableCell>
@@ -541,7 +589,15 @@ export default function ArbitrageAnalysisPage() {
       )}
 
       {!statistics && !loading && (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
+        <Paper sx={{ 
+          p: 4, 
+          textAlign: 'center',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+          },
+        }}>
           <Typography variant="h6" color="text.secondary">
             暂无数据，请先点击"开始检测"按钮
           </Typography>
@@ -550,4 +606,3 @@ export default function ArbitrageAnalysisPage() {
     </Container>
   );
 }
-

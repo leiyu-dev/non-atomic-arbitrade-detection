@@ -1,4 +1,4 @@
-'use client';``
+'use client';
 import {
   Container,
   Typography,
@@ -12,208 +12,409 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Chip,
+  Grid,
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import Link from 'next/link';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import BoltIcon from '@mui/icons-material/Bolt';
+import ParticleBackground from '@/app/components/ParticleBackground';
 
 export default function Home() {
+  const features = [
+    {
+      icon: <CompareArrowsIcon sx={{ fontSize: 40 }} />,
+      title: '价格对比分析',
+      description: '实时展示 Uniswap V3 与 Binance 的历史成交数据，通过可视化图表对比价格变化趋势。',
+      features: ['历史交易数据展示', '价格走势可视化对比', '统计信息与价格差异分析'],
+      color: 'primary',
+      href: '/price-comparison',
+    },
+    {
+      icon: <BoltIcon sx={{ fontSize: 40 }} />,
+      title: '套利机会检测',
+      description: '通过启发式规则和统计分析方法，识别 Uniswap V3 与 Binance 之间的非原子套利机会。',
+      features: ['套利机会自动检测', '潜在利润计算', '套利方向与统计分析'],
+      color: 'secondary',
+      href: '/arbitrage-analysis',
+    },
+    {
+      icon: <AccountBalanceIcon sx={{ fontSize: 40 }} />,
+      title: '套利行为识别',
+      description: '基于学术论文方法，从 Dune Analytics 获取真实链上数据，由此来分析套利者交易行为。',
+      features: ['真实链上套利交易', 'Top 套利者排行', '收益与利润分析'],
+      color: 'warning',
+      href: '/cexdex-analysis',
+    },
+  ];
+
   return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
-      {/* 标题部分 */}
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
-          非原子套利分析系统
-        </Typography>
-        <Typography variant="h5" color="text.secondary" gutterBottom>
-          Uniswap V3 与 CEX 之间的套利分析平台
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-          支持套利机会检测与真实链上套利行为识别
-        </Typography>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* 粒子特效背景 - 设置更低的透明度 */}
+      <Box sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 0,
+        opacity: 0.3, // 降低整体透明度
+      }}>
+        <ParticleBackground />
       </Box>
 
-      {/* 功能介绍卡片 */}
-      <Grid container spacing={4} sx={{ mb: 6 }}>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CompareArrowsIcon sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
-                <Typography variant="h5" component="h2">
-                  价格对比分析
-                </Typography>
-              </Box>
-              <Typography variant="body1" color="text.secondary" paragraph>
-                实时展示 Uniswap V3 (USDT/ETH) 与 Binance (ETHUSDT) 的历史成交数据，
-                并通过可视化图表对比两者的价格变化趋势。
-              </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemText primary="• 历史交易数据展示" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="• 价格走势可视化对比" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="• 统计信息与价格差异分析" />
-                </ListItem>
-              </List>
-            </CardContent>
-            <CardActions>
+      {/* Hero Section - 隐藏粒子效果 */}
+      <Box 
+        sx={{ 
+          background: 'linear-gradient(135deg, #0A0A0A 0%, #0F1A15 30%, #1A2A22 70%, #0F1A15 100%)',
+          color: 'white',
+          py: 12,
+          position: 'relative',
+          overflow: 'hidden',
+          borderBottom: '1px solid rgba(0, 255, 136, 0.2)',
+          zIndex: 2, // 确保在粒子层之上
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at 50% 50%, rgba(0, 255, 136, 0.05) 0%, transparent 50%)',
+            zIndex: 0,
+          },
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.3), transparent)',
+          }
+        }}
+      >
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+            <Chip 
+              label="专业套利分析平台" 
+              sx={{ 
+                backgroundColor: 'rgba(0, 255, 136, 0.15)',
+                color: '#33FFAA',
+                mb: 3,
+                fontWeight: 600,
+                border: '1px solid rgba(0, 255, 136, 0.4)',
+                backdropFilter: 'blur(10px)',
+                fontSize: '0.9rem',
+                letterSpacing: '0.5px',
+              }} 
+            />
+            <Typography variant="h1" component="h1" gutterBottom sx={{ 
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #33FFAA 0%, #00FF88 30%, #00CC66 70%, #00994C 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: '0 4px 20px rgba(0, 255, 136, 0.3)',
+              letterSpacing: '-0.5px',
+              lineHeight: 1.1,
+              mb: 2,
+              fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem', lg: '4rem' },
+            }}>
+              非原子套利分析系统
+            </Typography>
+            <Typography variant="h5" sx={{ 
+              mb: 4, 
+              maxWidth: '600px', 
+              mx: 'auto',
+              color: 'rgba(255, 255, 255, 0.85)',
+              fontWeight: 400,
+              lineHeight: 1.6,
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+            }}>
+              Uniswap V3 与 CEX 之间的高级套利分析平台，支持机会检测与真实链上行为识别
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
               <Button
-                size="large"
                 variant="contained"
-                component={Link}
-                href="/price-comparison"
-                fullWidth
-              >
-                查看价格对比
-              </Button>
-            </CardActions>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <TrendingUpIcon sx={{ fontSize: 40, color: 'success.main', mr: 2 }} />
-                <Typography variant="h5" component="h2">
-                  套利机会检测
-                </Typography>
-              </Box>
-              <Typography variant="body1" color="text.secondary" paragraph>
-                通过启发式规则和统计分析方法，识别 Uniswap V3 与 Binance 之间的
-                非原子套利机会，并计算潜在利润（USDT）。
-              </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemText primary="• 套利机会自动检测" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="• 潜在利润计算" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="• 套利方向与统计分析" />
-                </ListItem>
-              </List>
-            </CardContent>
-            <CardActions>
-              <Button
                 size="large"
-                variant="contained"
-                color="success"
+                sx={{
+                  fontWeight: 600,
+                  px: 4,
+                  py: 1.5,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  fontSize: '1rem',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
+                    transition: 'left 0.5s ease',
+                  },
+                  '&:hover::before': {
+                    left: '100%',
+                  },
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(0, 255, 136, 0.4)',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
                 component={Link}
                 href="/arbitrage-analysis"
-                fullWidth
               >
-                查看套利机会
+                开始分析
               </Button>
-            </CardActions>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ height: '100%', border: '2px solid', borderColor: 'warning.main' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <AccountBalanceIcon sx={{ fontSize: 40, color: 'warning.main', mr: 2 }} />
-                <Typography variant="h5" component="h2">
-                  套利行为识别
-                </Typography>
-              </Box>
-              <Typography variant="body1" color="text.secondary" paragraph>
-                基于学术论文方法，从 Dune Analytics 获取真实链上数据，
-                识别并分析 CEX-DEX 套利者的实际交易行为和盈利情况。
-              </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemText primary="• 真实链上套利交易" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="• Top 套利者排行" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="• 收益与利润分析" />
-                </ListItem>
-              </List>
-            </CardContent>
-            <CardActions>
               <Button
+                variant="outlined"
                 size="large"
-                variant="contained"
-                color="warning"
+                sx={{
+                  borderColor: 'rgba(0, 255, 136, 0.6)',
+                  color: '#33FFAA',
+                  fontWeight: 600,
+                  px: 4,
+                  py: 1.5,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  fontSize: '1rem',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent)',
+                    transition: 'left 0.5s ease',
+                  },
+                  '&:hover::before': {
+                    left: '100%',
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 255, 136, 0.08)',
+                    transform: 'translateY(-2px)',
+                    borderColor: '#33FFAA',
+                    color: '#33FFAA',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
                 component={Link}
-                href="/cexdex-analysis"
-                fullWidth
+                href="/price-comparison"
               >
-                查看套利行为
+                查看价格
               </Button>
-            </CardActions>
-          </Card>
-        </Grid>
-      </Grid>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
 
-      <Divider sx={{ my: 4 }} />
-
-      {/* 技术说明 */}
-      <Paper sx={{ p: 4, mb: 4 }}>
-        <Typography variant="h5" gutterBottom fontWeight="bold">
-          <AccountBalanceIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-          技术说明
-        </Typography>
-
-        <Grid container spacing={3} sx={{ mt: 2 }}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Typography variant="h6" gutterBottom color="primary">
-              数据来源
-            </Typography>
-            <List>
-              <ListItem>
-                <ListItemText
-                  primary="Uniswap V3"
-                  secondary="池地址：0x11b815efB8f581194ae79006d24E0d814B7697F6"
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary="Binance"
-                  secondary="交易对：ETHUSDT"
-                />
-              </ListItem>
-            </List>
+      {/* Features Section - 显示微妙的粒子效果 */}
+      <Box sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth="lg" sx={{ py: 10 }}>
+          <Grid container spacing={4}>
+            {features.map((feature, index) => (
+              <Grid key={feature.title} size={{ xs: 12, md: 4 }}>
+                <Card 
+                  className="fade-in"
+                  sx={{ 
+                    height: '100%',
+                    transition: 'all 0.3s ease',
+                    backgroundColor: 'rgba(42, 42, 42, 0.7)', // 半透明背景
+                    backdropFilter: 'blur(10px)', // 毛玻璃效果
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 4 }}>
+                    <Box 
+                      sx={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 80,
+                        height: 80,
+                        borderRadius: 3,
+                        background: 'linear-gradient(135deg, rgba(42, 42, 42, 0.8) 0%, rgba(58, 58, 58, 0.8) 100%)',
+                        color: '#00FF88',
+                        mb: 3,
+                        mx: 'auto',
+                        border: '1px solid rgba(0, 255, 136, 0.3)',
+                      }}
+                    >
+                      {feature.icon}
+                    </Box>
+                    <Typography variant="h5" component="h3" gutterBottom align="center" fontWeight={600}>
+                      {feature.title}
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" paragraph align="center">
+                      {feature.description}
+                    </Typography>
+                    <List dense>
+                      {feature.features.map((item) => (
+                        <ListItem key={item} sx={{ px: 0 }}>
+                          <Box 
+                            component="span" 
+                            sx={{ 
+                              color: '#00FF88',
+                              mr: 1.5,
+                              fontWeight: 600,
+                            }}
+                          >
+                            •
+                          </Box>
+                          <ListItemText 
+                            primary={item} 
+                            primaryTypographyProps={{ fontWeight: 500 }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </CardContent>
+                  <CardActions sx={{ p: 3, pt: 0 }}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color={feature.color as any}
+                      component={Link}
+                      href={feature.href}
+                      sx={{
+                        py: 1.5,
+                        fontWeight: 600,
+                        borderRadius: 2,
+                      }}
+                    >
+                      开始使用
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
-{/* 
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Typography variant="h6" gutterBottom color="secondary">
-              检测方法
-            </Typography>
-            <List>
-              <ListItem>
-                <ListItemText
-                  primary="时间窗口匹配"
-                  secondary="使用滑动时间窗口匹配交易"
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary="价格差异分析"
-                  secondary="计算考虑手续费和滑点的净利润"
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary="启发式过滤"
-                  secondary="根据最小利润阈值筛选机会"
-                />
-              </ListItem>
-            </List>
-          </Grid> */}
-        </Grid>
-      </Paper>
-    </Container>
+        </Container>
+      </Box>
+
+      {/* Tech Specs Section - 显示微妙的粒子效果 */}
+      <Box sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth="lg" sx={{ py: 8 }}>
+          <Paper 
+            sx={{ 
+              p: 6,
+              border: '1px solid rgba(0, 255, 136, 0.1)',
+              background: 'linear-gradient(145deg, rgba(26, 26, 26, 0.8) 0%, rgba(42, 42, 42, 0.8) 100%)',
+              backdropFilter: 'blur(10px)', // 毛玻璃效果
+            }}
+          >
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <Box 
+                sx={{ 
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 80,
+                  height: 80,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(42, 42, 42, 0.8) 0%, rgba(58, 58, 58, 0.8) 100%)',
+                  color: '#00FF88',
+                  mb: 2,
+                  border: '1px solid rgba(0, 255, 136, 0.3)',
+                }}
+              >
+                <TrendingUpIcon sx={{ fontSize: 40 }} />
+              </Box>
+              <Typography variant="h4" component="h2" gutterBottom fontWeight={700}>
+                技术规格
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                基于先进的数据分析和机器学习技术
+              </Typography>
+            </Box>
+
+            <Grid container spacing={4}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: '#00FF88' }} fontWeight={600}>
+                  📊 数据来源
+                </Typography>
+                <List>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="Uniswap V3"
+                      secondary="池地址：0x11b815efB8f581194ae79006d24E0d814B7697F6"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="Binance"
+                      secondary="交易对：ETHUSDT，实时市场数据"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="Dune Analytics"
+                      secondary="链上交易数据分析与可视化"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                </List>
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: '#00FF88' }} fontWeight={600}>
+                  ⚡ 技术特性
+                </Typography>
+                <List>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="实时数据处理"
+                      secondary="毫秒级数据更新与处理能力"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="智能算法检测"
+                      secondary="基于机器学习的套利机会识别"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                  <ListItem sx={{ px: 0 }}>
+                    <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
+                    <ListItemText
+                      primary="可视化分析"
+                      secondary="交互式图表与数据可视化"
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontWeight: 500 }}
+                    />
+                  </ListItem>
+                </List>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Container>
+      </Box>
+    </Box>
   );
 }
