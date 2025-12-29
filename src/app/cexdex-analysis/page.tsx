@@ -32,6 +32,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import { format } from 'date-fns';
 import axios from 'axios';
+import * as echarts from 'echarts';
 import ReactECharts from 'echarts-for-react';
 
 interface CexDexArbitrage {
@@ -164,7 +165,7 @@ export default function CexDexAnalysisPage() {
     });
 
     const sortedDates = Array.from(dailyData.keys()).sort();
-    const mevValues = sortedDates.map(date => dailyData.get(date)!.mevValue.toFixed(4));
+    const mevValues = sortedDates.map(date => parseFloat(dailyData.get(date)!.mevValue.toFixed(4)));
     const counts = sortedDates.map(date => dailyData.get(date)!.count);
 
     return {
@@ -172,25 +173,58 @@ export default function CexDexAnalysisPage() {
         text: 'MEV 价值时间趋势',
         left: 'center',
         textStyle: {
-          color: '#FFFFFF', // 标题文字改为白色
+          color: '#FFFFFF',
+          fontSize: 16,
+          fontWeight: 'bold',
+          textShadow: '0 0 10px rgba(76, 175, 80, 0.5)',
         },
       },
       tooltip: {
         trigger: 'axis',
         axisPointer: {
           type: 'cross',
+          crossStyle: {
+            color: '#FFFFFF',
+            opacity: 0.3,
+          },
+        },
+        formatter: (params: any) => {
+          const date = params[0].axisValue;
+          let result = `<div style="padding: 8px;"><b>${date}</b></div>`;
+          
+          params.forEach((param: any) => {
+            const color = param.color;
+            const value = param.seriesName.includes('MEV') ? `${param.value} ETH` : param.value;
+            result += `<div style="display: flex; align-items: center; margin: 2px 0;">
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 6px;"></span>
+              <span>${param.seriesName}: </span>
+              <span style="color: ${color}; font-weight: bold;">${value}</span>
+            </div>`;
+          });
+          
+          return result;
         },
         textStyle: {
-          color: '#FFFFFF', // 提示文字改为白色
+          color: '#FFFFFF',
+          fontSize: 12,
         },
-        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        borderRadius: 8,
+        boxShadow: '0 6px 16px rgba(0, 0, 0, 0.5)',
       },
       legend: {
         data: ['每日 MEV 价值 (ETH)', '交易数量'],
         top: 40,
         textStyle: {
-          color: '#FFFFFF', // 图例文字改为白色
+          color: 'rgba(255, 255, 255, 0.9)',
+          fontSize: 13,
+          fontWeight: '500',
         },
+        itemWidth: 18,
+        itemHeight: 18,
+        itemGap: 20,
       },
       grid: {
         left: '5%',
@@ -204,12 +238,33 @@ export default function CexDexAnalysisPage() {
         boundaryGap: true,
         data: sortedDates,
         axisLabel: {
-          rotate: 45,
-          color: '#FFFFFF', // X轴标签改为白色
+          rotate: 0, // 横向显示日期
+          color: '#FFFFFF',
+          fontSize: 11,
+          fontWeight: '500',
+          show: true,
+          // 均匀显示6个日期
+          interval: function(index: number, value: any) {
+            const total = sortedDates.length;
+            // 计算间隔，确保显示约6个标签
+            const interval = Math.max(1, Math.floor((total - 1) / 5));
+            return index === 0 || index === total - 1 || index % interval === 0;
+          },
+          formatter: function(value: any) {
+            // 保持日期格式一致
+            return value;
+          },
         },
         axisLine: {
           lineStyle: {
-            color: '#FFFFFF', // X轴线改为白色
+            color: 'rgba(255, 255, 255, 0.3)',
+          },
+        },
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: 'rgba(255, 255, 255, 0.1)',
+            type: 'dashed',
           },
         },
       },
@@ -218,32 +273,48 @@ export default function CexDexAnalysisPage() {
           type: 'value',
           name: 'MEV 价值 (ETH)',
           position: 'left',
+          nameTextStyle: {
+            color: '#4CAF50',
+            fontSize: 12,
+            fontWeight: 'bold',
+          },
           axisLabel: {
-            color: '#FFFFFF', // Y轴标签改为白色
+            color: 'rgba(255, 255, 255, 0.8)',
+            fontSize: 11,
           },
           axisLine: {
             lineStyle: {
-              color: '#FFFFFF', // Y轴线改为白色
+              color: 'rgba(76, 175, 80, 0.5)',
             },
           },
-          nameTextStyle: {
-            color: '#FFFFFF', // 轴名称改为白色
+          splitLine: {
+            show: true,
+            lineStyle: {
+              color: 'rgba(255, 255, 255, 0.1)',
+              type: 'dashed',
+            },
           },
         },
         {
           type: 'value',
           name: '交易数量',
           position: 'right',
+          nameTextStyle: {
+            color: '#2196F3',
+            fontSize: 12,
+            fontWeight: 'bold',
+          },
           axisLabel: {
-            color: '#FFFFFF', // Y轴标签改为白色
+            color: 'rgba(255, 255, 255, 0.8)',
+            fontSize: 11,
           },
           axisLine: {
             lineStyle: {
-              color: '#FFFFFF', // Y轴线改为白色
+              color: 'rgba(33, 150, 243, 0.5)',
             },
           },
-          nameTextStyle: {
-            color: '#FFFFFF', // 轴名称改为白色
+          splitLine: {
+            show: false,
           },
         },
       ],
@@ -253,23 +324,82 @@ export default function CexDexAnalysisPage() {
           type: 'line',
           data: mevValues,
           smooth: true,
+          symbol: 'circle',
+          symbolSize: 6,
+          lineStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+              { offset: 0, color: '#4CAF50' },
+              { offset: 1, color: '#8BC34A' },
+            ]),
+            width: 3,
+            shadowColor: 'rgba(76, 175, 80, 0.5)',
+            shadowBlur: 10,
+            shadowOffsetY: 3,
+          },
           itemStyle: {
-            color: '#4caf50',
+            color: '#4CAF50',
+            borderColor: '#FFFFFF',
+            borderWidth: 2,
+            shadowColor: 'rgba(76, 175, 80, 0.8)',
+            shadowBlur: 8,
           },
           areaStyle: {
-            color: 'rgba(76, 175, 80, 0.3)',
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: 'rgba(76, 175, 80, 0.3)' },
+              { offset: 1, color: 'rgba(76, 175, 80, 0.05)' },
+            ]),
           },
+          emphasis: {
+            lineStyle: {
+              width: 5,
+            },
+            itemStyle: {
+              symbolSize: 12,
+              shadowBlur: 15,
+            },
+          },
+          animation: true,
+          animationDuration: 2000,
+          animationEasing: 'cubicOut',
         },
         {
           name: '交易数量',
           type: 'bar',
           yAxisIndex: 1,
           data: counts,
-itemStyle: {
-            color: '#2196f3',
+          barWidth: '40%',
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#2196F3' },
+              { offset: 1, color: '#1976D2' },
+            ]),
+            borderRadius: [4, 4, 0, 0],
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderWidth: 1,
+            shadowColor: 'rgba(33, 150, 243, 0.5)',
+            shadowBlur: 8,
+            shadowOffsetY: 2,
           },
-},
+          emphasis: {
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#4FC3F7' },
+                { offset: 1, color: '#29B6F6' },
+              ]),
+              shadowBlur: 15,
+              shadowColor: 'rgba(33, 150, 243, 0.8)',
+            },
+          },
+          animation: true,
+          animationDuration: 1200,
+          animationEasing: 'bounceOut',
+          animationDelay: (idx: number) => idx * 50,
+        },
       ],
+      backgroundColor: 'transparent',
+      textStyle: {
+        fontFamily: 'Arial, sans-serif',
+      },
     };
   };
 
@@ -288,7 +418,7 @@ itemStyle: {
     });
 
     const sortedDates = Array.from(dailyData.keys()).sort();
-    const volumes = sortedDates.map(date => (dailyData.get(date)! / 1000).toFixed(2)); // 转换为 K USD
+    const volumes = sortedDates.map(date => parseFloat((dailyData.get(date)! / 1000).toFixed(2))); // 转换为 K USD
 
     return {
       title: {
@@ -319,8 +449,22 @@ itemStyle: {
         type: 'category',
         data: sortedDates,
         axisLabel: {
-          rotate: 45,
+          rotate: 0, // 横向显示日期
           color: '#FFFFFF', // X轴标签改为白色
+          fontSize: 11,
+          fontWeight: '500',
+          show: true,
+          // 均匀显示6个日期，与左边图表保持一致
+          interval: function(index: number, value: any) {
+            const total = sortedDates.length;
+            // 计算间隔，确保显示约6个标签
+            const interval = Math.max(1, Math.floor((total - 1) / 5));
+            return index === 0 || index === total - 1 || index % interval === 0;
+          },
+          formatter: function(value: any) {
+            // 保持日期格式一致
+            return value;
+          },
         },
         axisLine: {
           lineStyle: {
@@ -367,7 +511,7 @@ itemStyle: {
     const addresses = statistics.topSearchers.map(s => 
       `${s.address.slice(0, 6)}...${s.address.slice(-4)}`
     );
-    const mevValues = statistics.topSearchers.map(s => s.totalMevValue.toFixed(4));
+    const mevValues = statistics.topSearchers.map(s => parseFloat(s.totalMevValue.toFixed(4)));
     const counts = statistics.topSearchers.map(s => s.count);
 
     return {
@@ -411,9 +555,7 @@ itemStyle: {
         type: 'category',
         data: addresses,
         axisLabel: {
-          interval: 0,
-          rotate: 45,
-          color: '#FFFFFF', // X轴标签改为白色
+          show: false, // 默认隐藏 x 轴标签
         },
         axisLine: {
           lineStyle: {
@@ -495,9 +637,9 @@ name: 'MEV 价值 (ETH)',
     });
 
     const sortedDates = Array.from(dailyData.keys()).sort();
-    const baseFees = sortedDates.map(date => dailyData.get(date)!.baseFees.toFixed(4));
-    const priorityFees = sortedDates.map(date => dailyData.get(date)!.priorityFees.toFixed(4));
-    const mevValues = sortedDates.map(date => dailyData.get(date)!.mevValue.toFixed(4));
+    const baseFees = sortedDates.map(date => parseFloat(dailyData.get(date)!.baseFees.toFixed(4)));
+    const priorityFees = sortedDates.map(date => parseFloat(dailyData.get(date)!.priorityFees.toFixed(4)));
+    const mevValues = sortedDates.map(date => parseFloat(dailyData.get(date)!.mevValue.toFixed(4)));
 
     return {
       title: {
@@ -525,7 +667,7 @@ top: '20%',
         type: 'category',
         data: sortedDates,
         axisLabel: {
-          rotate: 45,
+          show: false, // 默认隐藏 x 轴标签
         },
       },
       yAxis: {

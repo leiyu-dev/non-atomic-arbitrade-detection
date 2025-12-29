@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import ReactECharts from 'echarts-for-react';
+import * as echarts from 'echarts';
 import { format } from 'date-fns';
 
 interface TradeData {
@@ -143,7 +144,10 @@ export default function PriceComparisonPage() {
         text: 'Uniswap V3 vs Binance ETH/USDT 价格对比',
         left: 'center',
         textStyle: {
-          color: '#FFFFFF', // 标题文字改为白色
+          color: '#FFFFFF',
+          fontSize: 16,
+          fontWeight: 'bold',
+          textShadow: '0 0 10px rgba(255, 255, 255, 0.3)',
         },
       },
       tooltip: {
@@ -152,62 +156,98 @@ export default function PriceComparisonPage() {
           type: 'cross',
         },
         formatter: (params: any) => {
-          let result = `${params[0].axisValue}<br/>`;
+          const result = [];
+          const date = new Date(params[0].axisValue);
+          result.push(`<div style="padding: 4px 0;"><b>${format(date, 'yyyy-MM-dd HH:mm')}</b></div>`);
           params.forEach((param: any) => {
             if (param.value[1] !== null) {
-              result += `${param.marker} ${param.seriesName}: $${param.value[1].toFixed(2)}<br/>`;
+              const color = param.color;
+              result.push(`<div style="display: flex; align-items: center; margin: 2px 0;">
+                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 6px;"></span>
+                <span>${param.seriesName}: </span>
+                <span style="color: ${color}; font-weight: bold;">${param.value[1].toFixed(2)}</span>
+              </div>`);
             }
           });
-          return result;
+          return result.join('');
         },
         textStyle: {
-          color: '#FFFFFF', // 提示文字改为白色
+          color: '#FFFFFF',
+          fontSize: 12,
         },
-        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        borderRadius: 8,
+        boxShadow: '0 6px 16px rgba(0, 0, 0, 0.5)',
+        padding: 12,
       },
       legend: {
         data: ['Uniswap V3', 'Binance'],
-        top: 30,
+        top: 40,
         textStyle: {
-          color: '#FFFFFF', // 图例文字改为白色
+          color: 'rgba(255, 255, 255, 0.9)',
+          fontSize: 13,
+          fontWeight: '500',
         },
+        itemWidth: 18,
+        itemHeight: 18,
+        itemGap: 20,
+        borderRadius: 4,
       },
       grid: {
         left: '3%',
         right: '4%',
-        bottom: '3%',
+        bottom: '10%',
+        top: '20%',
         containLabel: true,
       },
       xAxis: {
         type: 'category',
         boundaryGap: false,
         axisLabel: {
-          rotate: 45,
-          formatter: (value: string) => {
-            return format(new Date(value), 'MM-dd HH:mm');
-          },
-          color: '#FFFFFF', // X轴标签改为白色
+          show: false, // 默认隐藏 x 轴标签
         },
         axisLine: {
           lineStyle: {
-            color: '#FFFFFF', // X轴线改为白色
+            color: 'rgba(255, 255, 255, 0.3)',
+          },
+        },
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: 'rgba(255, 255, 255, 0.1)',
+            type: 'dashed',
           },
         },
       },
       yAxis: {
         type: 'value',
         name: '价格 (USDT)',
+        nameLocation: 'middle',
+        nameGap: 50,
+        nameTextStyle: {
+          color: '#FFFFFF',
+          fontSize: 12,
+          fontWeight: 'bold',
+        },
         axisLabel: {
           formatter: '${value}',
-          color: '#FFFFFF', // Y轴标签改为白色
+          color: 'rgba(255, 255, 255, 0.8)',
+          fontSize: 11,
+          fontWeight: '500',
         },
         axisLine: {
           lineStyle: {
-            color: '#FFFFFF', // Y轴线改为白色
+            color: 'rgba(255, 255, 255, 0.3)',
           },
         },
-        nameTextStyle: {
-          color: '#FFFFFF', // 轴名称改为白色
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: 'rgba(255, 255, 255, 0.1)',
+            type: 'dashed',
+          },
         },
       },
       series: [
@@ -216,32 +256,115 @@ export default function PriceComparisonPage() {
           type: 'line',
           data: uniswapData,
           smooth: true,
+          symbol: 'circle',
+          symbolSize: 6,
+          sampling: 'lttb',
           lineStyle: {
-            color: '#FF007A',
-            width: 2,
+            color: '#2196F3',
+            width: 3,
+            shadowColor: 'rgba(33, 150, 243, 0.5)',
+            shadowBlur: 10,
+            shadowOffsetY: 3,
           },
           itemStyle: {
-            color: '#FF007A',
+            color: '#2196F3',
+            borderColor: '#FFFFFF',
+            borderWidth: 2,
+            shadowColor: 'rgba(33, 150, 243, 0.8)',
+            shadowBlur: 8,
           },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(33, 150, 243, 0.3)' },
+                { offset: 1, color: 'rgba(33, 150, 243, 0.05)' }
+              ]
+            },
+          },
+          emphasis: {
+            lineStyle: {
+              width: 5,
+            },
+            itemStyle: {
+              symbolSize: 12,
+              shadowBlur: 15,
+            },
+          },
+          animation: true,
+          animationDuration: 2000,
+          animationEasing: 'cubicOut',
         },
         {
           name: 'Binance',
           type: 'line',
           data: binanceData,
           smooth: true,
+          symbol: 'circle',
+          symbolSize: 6,
+          sampling: 'lttb',
           lineStyle: {
             color: '#F0B90B',
-            width: 2,
+            width: 3,
+            shadowColor: 'rgba(240, 185, 11, 0.5)',
+            shadowBlur: 10,
+            shadowOffsetY: 3,
           },
           itemStyle: {
             color: '#F0B90B',
+            borderColor: '#FFFFFF',
+            borderWidth: 2,
+            shadowColor: 'rgba(240, 185, 11, 0.8)',
+            shadowBlur: 8,
           },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(240, 185, 11, 0.3)' },
+                { offset: 1, color: 'rgba(240, 185, 11, 0.05)' }
+              ]
+            },
+          },
+          emphasis: {
+            lineStyle: {
+              width: 5,
+            },
+            itemStyle: {
+              symbolSize: 12,
+              shadowBlur: 15,
+            },
+          },
+          animation: true,
+          animationDuration: 2000,
+          animationEasing: 'cubicOut',
+          animationDelay: 300,
         },
       ],
       dataZoom: [
         {
           type: 'slider',
           show: true,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          borderColor: 'rgba(255, 255, 255, 0.3)',
+          fillerColor: 'rgba(255, 255, 255, 0.15)',
+          textStyle: {
+            color: '#FFFFFF',
+            fontSize: 11,
+          },
+          handleStyle: {
+            color: '#FFFFFF',
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 0, 0, 0.5)',
+          },
           start: 0,
           end: 100,
         },
@@ -249,6 +372,10 @@ export default function PriceComparisonPage() {
           type: 'inside',
         },
       ],
+      backgroundColor: 'transparent',
+      textStyle: {
+        fontFamily: 'Arial, sans-serif',
+      },
     };
   };
 
