@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import ReactECharts from 'echarts-for-react';
+import * as echarts from 'echarts';
 import { format } from 'date-fns';
 
 interface ArbitrageStatistics {
@@ -142,7 +143,10 @@ const [detecting, setDetecting] = useState(false);
         text: '套利利润时间分布',
         left: 'center',
         textStyle: {
-          color: '#FFFFFF', // 标题文字改为白色
+          color: '#FFFFFF',
+          fontSize: 16,
+          fontWeight: 'bold',
+          textShadow: '0 0 10px rgba(0, 255, 136, 0.5)',
         },
       },
       tooltip: {
@@ -150,42 +154,72 @@ const [detecting, setDetecting] = useState(false);
         formatter: (params: any) => {
           const date = format(new Date(params[0].value[0]), 'yyyy-MM-dd HH:mm');
           const profit = params[0].value[1].toFixed(2);
-          return `${date}<br/>潜在利润: $${profit}`;
+          return `<div style="padding: 8px;"><b>${date}</b><br/>潜在利润: <span style="color: #00FF88;">${profit}</span></div>`;
         },
         textStyle: {
-          color: '#FFFFFF', // 提示文字改为白色
+          color: '#FFFFFF',
+          fontSize: 12,
         },
-        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        borderColor: '#00FF88',
+        borderWidth: 1,
+        borderRadius: 8,
+        boxShadow: '0 4px 12px rgba(0, 255, 136, 0.3)',
+        transition: 'all 0.3s ease',
       },
       xAxis: {
         type: 'time',
         name: '时间',
+        nameLocation: 'middle',
+        nameGap: 30,
+        nameTextStyle: {
+          color: '#00FF88',
+          fontSize: 12,
+          fontWeight: 'bold',
+        },
         axisLabel: {
-          color: '#FFFFFF', // X轴标签改为白色
+          color: 'rgba(255, 255, 255, 0.8)',
+          fontSize: 10,
         },
         axisLine: {
           lineStyle: {
-            color: '#FFFFFF', // X轴线改为白色
+            color: 'rgba(0, 255, 136, 0.5)',
           },
         },
-        nameTextStyle: {
-          color: '#FFFFFF', // 轴名称改为白色
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: 'rgba(255, 255, 255, 0.1)',
+            type: 'dashed',
+          },
         },
       },
       yAxis: {
         type: 'value',
         name: '利润 (USDT)',
+        nameLocation: 'middle',
+        nameGap: 50,
+        nameTextStyle: {
+          color: '#00FF88',
+          fontSize: 12,
+          fontWeight: 'bold',
+        },
         axisLabel: {
           formatter: '${value}',
-          color: '#FFFFFF', // Y轴标签改为白色
+          color: 'rgba(255, 255, 255, 0.8)',
+          fontSize: 10,
         },
         axisLine: {
           lineStyle: {
-            color: '#FFFFFF', // Y轴线改为白色
+            color: 'rgba(0, 255, 136, 0.5)',
           },
         },
-        nameTextStyle: {
-          color: '#FFFFFF', // 轴名称改为白色
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: 'rgba(255, 255, 255, 0.1)',
+            type: 'dashed',
+          },
         },
       },
       series: [
@@ -193,21 +227,56 @@ const [detecting, setDetecting] = useState(false);
           name: '潜在利润',
           type: 'scatter',
           data: data,
-          symbolSize: 8,
+          symbolSize: 10,
           itemStyle: {
-            color: '#00C853',
+            color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
+              { offset: 0, color: '#00FF88' },
+              { offset: 1, color: '#00AA66' },
+            ]),
+            borderColor: '#FFFFFF',
+            borderWidth: 2,
+            shadowColor: 'rgba(0, 255, 136, 0.8)',
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowOffsetY: 0,
           },
+          emphasis: {
+            itemStyle: {
+              symbolSize: 18,
+              shadowBlur: 20,
+              shadowColor: 'rgba(0, 255, 136, 1)',
+            },
+          },
+          animation: true,
+          animationDuration: 1500,
+          animationEasing: 'elasticOut',
+          animationDelay: (idx: number) => idx * 10,
         },
       ],
       dataZoom: [
         {
           type: 'slider',
           show: true,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          borderColor: 'rgba(0, 255, 136, 0.5)',
+          fillerColor: 'rgba(0, 255, 136, 0.2)',
+          textStyle: {
+            color: '#FFFFFF',
+          },
+          handleStyle: {
+            color: '#00FF88',
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 255, 136, 0.5)',
+          },
         },
         {
           type: 'inside',
         },
       ],
+      backgroundColor: 'transparent',
+      textStyle: {
+        fontFamily: 'Arial, sans-serif',
+      },
     };
   };
 
@@ -235,48 +304,87 @@ return {
         text: '价格差异分布',
         left: 'center',
         textStyle: {
-          color: '#FFFFFF', // 标题文字改为白色
+          color: '#FFFFFF',
+          fontSize: 16,
+          fontWeight: 'bold',
+          textShadow: '0 0 10px rgba(0, 162, 255, 0.5)',
         },
       },
       tooltip: {
         trigger: 'axis',
         axisPointer: {
           type: 'shadow',
+          shadowColor: 'rgba(0, 162, 255, 0.3)',
+        },
+        formatter: (params: any) => {
+          const category = params[0].name;
+          const count = params[0].value;
+          return `<div style="padding: 8px;"><b>${category}</b><br/>机会数量: <span style="color: #00A2FF;">${count}</span></div>`;
         },
         textStyle: {
-          color: '#FFFFFF', // 提示文字改为白色
+          color: '#FFFFFF',
+          fontSize: 12,
         },
-        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        borderColor: '#00A2FF',
+        borderWidth: 1,
+        borderRadius: 8,
+        boxShadow: '0 4px 12px rgba(0, 162, 255, 0.3)',
       },
       xAxis: {
         type: 'category',
         data: categories,
         name: '价格差异百分比',
+        nameLocation: 'middle',
+        nameGap: 30,
+        nameTextStyle: {
+          color: '#00A2FF',
+          fontSize: 12,
+          fontWeight: 'bold',
+        },
         axisLabel: {
-          color: '#FFFFFF', // X轴标签改为白色
+          color: 'rgba(255, 255, 255, 0.8)',
+          fontSize: 11,
+          fontWeight: '500',
         },
         axisLine: {
           lineStyle: {
-            color: '#FFFFFF', // X轴线改为白色
+            color: 'rgba(0, 162, 255, 0.5)',
           },
         },
-        nameTextStyle: {
-          color: '#FFFFFF', // 轴名称改为白色
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: 'rgba(255, 255, 255, 0.1)',
+            type: 'dashed',
+          },
         },
       },
       yAxis: {
         type: 'value',
         name: '机会数量',
+        nameLocation: 'middle',
+        nameGap: 50,
+        nameTextStyle: {
+          color: '#00A2FF',
+          fontSize: 12,
+          fontWeight: 'bold',
+        },
         axisLabel: {
-          color: '#FFFFFF', // Y轴标签改为白色
+          color: 'rgba(255, 255, 255, 0.8)',
+          fontSize: 11,
         },
         axisLine: {
           lineStyle: {
-            color: '#FFFFFF', // Y轴线改为白色
+            color: 'rgba(0, 162, 255, 0.5)',
           },
         },
-        nameTextStyle: {
-color: '#FFFFFF', // 轴名称改为白色
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: 'rgba(255, 255, 255, 0.1)',
+            type: 'dashed',
+          },
         },
       },
       series: [
@@ -284,11 +392,39 @@ color: '#FFFFFF', // 轴名称改为白色
           name: '机会数量',
           type: 'bar',
           data: counts,
+          barWidth: '60%',
           itemStyle: {
-            color: '#2196F3',
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#00A2FF' },
+              { offset: 1, color: '#0066CC' },
+            ]),
+            borderRadius: [8, 8, 0, 0],
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderWidth: 1,
+            shadowColor: 'rgba(0, 162, 255, 0.5)',
+            shadowBlur: 8,
+            shadowOffsetY: 2,
           },
+          emphasis: {
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#00D4FF' },
+                { offset: 1, color: '#0088FF' },
+              ]),
+              shadowBlur: 15,
+              shadowColor: 'rgba(0, 212, 255, 0.8)',
+            },
+          },
+          animation: true,
+          animationDuration: 1200,
+          animationEasing: 'bounceOut',
+          animationDelay: (idx: number) => idx * 100,
         },
       ],
+      backgroundColor: 'transparent',
+      textStyle: {
+        fontFamily: 'Arial, sans-serif',
+      },
     };
   };
 
@@ -301,51 +437,117 @@ color: '#FFFFFF', // 轴名称改为白色
         text: '套利方向分布',
         left: 'center',
         textStyle: {
-          color: '#FFFFFF', // 标题文字改为白色
+          color: '#FFFFFF',
+          fontSize: 16,
+          fontWeight: 'bold',
+          textShadow: '0 0 10px rgba(33, 150, 243, 0.5)',
         },
       },
       tooltip: {
         trigger: 'item',
-        formatter: '{b}: {c} ({d}%)',
-        textStyle: {
-          color: '#FFFFFF', // 提示文字改为白色
+        formatter: (params: any) => {
+          const name = params.name;
+          const value = params.value;
+          const percent = params.percent.toFixed(2);
+          return `<div style="padding: 8px;"><b>${name}</b><br/>数量: <span style="color: #FF69B4;">${value}</span><br/>占比: <span style="color: #FF69B4;">${percent}%</span></div>`;
         },
-        backgroundColor: 'rgba(0, 0, 0, 0.8)', // 提示框背景
+        textStyle: {
+          color: '#FFFFFF',
+          fontSize: 12,
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        borderColor: '#2196F3',
+          borderWidth: 1,
+          borderRadius: 8,
+          boxShadow: '0 4px 12px rgba(33, 150, 243, 0.3)',
       },
       legend: {
         orient: 'vertical',
         left: 'left',
         top: 'center',
         textStyle: {
-          color: '#FFFFFF', // 图例文字改为白色
+          color: 'rgba(255, 255, 255, 0.9)',
+          fontSize: 12,
+          fontWeight: '500',
+        },
+        itemWidth: 16,
+        itemHeight: 16,
+        itemGap: 12,
+        formatter: (name: string) => {
+          return name.length > 15 ? name.substring(0, 15) + '...' : name;
         },
       },
       series: [
         {
           name: '套利方向',
           type: 'pie',
-          radius: '50%',
+          radius: ['35%', '60%'], // 环形图
+          center: ['60%', '50%'],
           data: [
             {
               value: statistics.buyUniswapCount,
               name: '买入 Uniswap, 卖出 Binance',
-              itemStyle: { color: '#FF007A' },
+              itemStyle: {
+                color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
+                  { offset: 0, color: '#2196F3' },
+                  { offset: 1, color: '#1565C0' },
+                ]),
+                borderColor: '#FFFFFF',
+                borderWidth: 2,
+              },
             },
             {
               value: statistics.buyBinanceCount,
               name: '买入 Binance, 卖出 Uniswap',
-              itemStyle: { color: '#F0B90B' },
+              itemStyle: {
+                color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
+                  { offset: 0, color: '#4CAF50' },
+                  { offset: 1, color: '#2E7D32' },
+                ]),
+                borderColor: '#FFFFFF',
+                borderWidth: 2,
+              },
             },
           ],
           emphasis: {
             itemStyle: {
-              shadowBlur: 10,
+              shadowBlur: 20,
               shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
+              shadowOffsetY: 0,
+              shadowColor: 'rgba(255, 255, 255, 0.8)',
+              scale: 1.1,
+            },
+            label: {
+              show: true,
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: '#FFFFFF',
             },
           },
+          label: {
+            show: true,
+            formatter: '{b}: {d}%',
+            color: '#FFFFFF',
+            fontSize: 12,
+            fontWeight: '500',
+          },
+          labelLine: {
+            show: true,
+            lineStyle: {
+              color: 'rgba(255, 255, 255, 0.6)',
+            },
+            length: 20,
+            length2: 30,
+          },
+          animation: true,
+          animationDuration: 1500,
+          animationEasing: 'cubicOut',
         },
       ],
+      backgroundColor: 'transparent',
+      textStyle: {
+        fontFamily: 'Arial, sans-serif',
+      },
     };
   };
 
