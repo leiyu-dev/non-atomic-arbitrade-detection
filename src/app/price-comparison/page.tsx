@@ -226,6 +226,7 @@ export default function PriceComparisonPage() {
         name: '价格 (USDT)',
         nameLocation: 'middle',
         nameGap: 50,
+        scale: true, // 启用自适应缩放，不从0开始
         nameTextStyle: {
           color: '#FFFFFF',
           fontSize: 12,

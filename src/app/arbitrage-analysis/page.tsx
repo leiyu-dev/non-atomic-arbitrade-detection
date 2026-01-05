@@ -58,7 +58,7 @@ const [detecting, setDetecting] = useState(false);
   const [params, setParams] = useState({
     tradeAmountETH: 1,
     tradingFeePercent: 0.1,
-    slippagePercent: 0,
+    slippagePercent: 0.1,
   });
 
   const startDate = '2025-09-01';
@@ -582,7 +582,7 @@ return {
           <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <TextField
               fullWidth
-              label="交易手续费 (%)"
+              label="交易手续费 ($)"
               type="number"
               value={isNaN(params.tradingFeePercent) ? '' : params.tradingFeePercent}
               onChange={e => {
