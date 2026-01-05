@@ -706,6 +706,126 @@ top: '20%',
     };
   };
 
+  // 5. MEV Bot 套利交易数占比饼图
+  const getMevBotTradesPieChartOption = () => {
+    if (!statistics || statistics.topSearchers.length === 0) return {};
+
+    // 按名称聚合交易数
+    const aggregatedData = new Map<string, number>();
+    statistics.topSearchers.forEach(searcher => {
+      const currentCount = aggregatedData.get(searcher.name) || 0;
+      aggregatedData.set(searcher.name, currentCount + searcher.count);
+    });
+
+    // 转换为数组并排序
+    const sortedData = Array.from(aggregatedData.entries())
+      .map(([name, count]) => ({ name, value: count }))
+      .sort((a, b) => b.value - a.value);
+
+    // 添加颜色
+    const pieData = sortedData.map((item, index) => ({
+      ...item,
+      itemStyle: {
+        color: [
+          '#4CAF50', // 绿色
+          '#2196F3', // 蓝色
+          '#FF9800', // 橙色
+          '#E91E63', // 粉色
+          '#9C27B0', // 紫色
+          '#00BCD4', // 青色
+          '#FFC107', // 黄色
+          '#F44336', // 红色
+          '#3F51B5', // 靛蓝
+          '#009688', // 青绿
+        ][index % 10],
+      },
+    }));
+
+    const total = pieData.reduce((sum, item) => sum + item.value, 0);
+
+    return {
+      title: {
+        text: 'MEV Bot 套利交易数占比',
+        left: 'center',
+        textStyle: {
+          color: '#FFFFFF',
+          fontSize: 16,
+          fontWeight: 'bold',
+        },
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => {
+          const percent = ((params.value / total) * 100).toFixed(2);
+          return `${params.name}<br/>交易数: ${params.value.toLocaleString()}<br/>占比: ${percent}%`;
+        },
+        textStyle: {
+          color: '#FFFFFF',
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+      },
+      legend: {
+        orient: 'vertical',
+        right: '5%',
+        top: 'center',
+        textStyle: {
+          color: '#FFFFFF',
+          fontSize: 11,
+        },
+        formatter: (name: string) => {
+          const item = pieData.find(d => d.name === name);
+          if (!item) return name;
+          const percent = ((item.value / total) * 100).toFixed(1);
+          return `${name}: ${percent}%`;
+        },
+      },
+      series: [
+        {
+          name: 'MEV Bot 交易数',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          center: ['40%', '50%'],
+          avoidLabelOverlap: true,
+          itemStyle: {
+            borderRadius: 8,
+            borderColor: '#000',
+            borderWidth: 2,
+          },
+          label: {
+            show: false,
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: 14,
+              fontWeight: 'bold',
+              color: '#FFFFFF',
+              formatter: (params: any) => {
+                const percent = ((params.value / total) * 100).toFixed(1);
+                return `${params.name}\n${percent}%`;
+              },
+            },
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+          labelLine: {
+            show: false,
+          },
+          data: pieData,
+          animationType: 'scale',
+          animationEasing: 'elasticOut',
+          animationDelay: (idx: number) => idx * 100,
+        },
+      ],
+      backgroundColor: 'transparent',
+    };
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box sx={{ mb: 4, mt: 8 }}>
@@ -833,7 +953,7 @@ top: '20%',
         }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              Top 套利者排行
+              Top 套利地址排行
             </Typography>
             <TableContainer sx={{ 
               transition: 'all 0.3s ease',
@@ -948,8 +1068,8 @@ top: '20%',
               </Paper>
             </Grid>
 
-            {/* Top 套利者柱状图 */}
-            <Grid size={{ xs: 12 }}>
+            {/* Top 套利者柱状图和饼图同行显示 */}
+            <Grid size={{ xs: 12, lg: 6 }}>
               <Paper sx={{ 
                 p: 2,
                 transition: 'all 0.3s ease',
@@ -960,6 +1080,23 @@ top: '20%',
               }}>
                 <ReactECharts
                   option={getTopSearchersChartOption()}
+                  style={{ height: '400px' }}
+                />
+              </Paper>
+            </Grid>
+
+            {/* MEV Bot 交易数占比饼图 */}
+            <Grid size={{ xs: 12, lg: 6 }}>
+              <Paper sx={{ 
+                p: 2,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 20px 40px rgba(0, 255, 136, 0.2)',
+                },
+              }}>
+                <ReactECharts
+                  option={getMevBotTradesPieChartOption()}
                   style={{ height: '400px' }}
                 />
               </Paper>

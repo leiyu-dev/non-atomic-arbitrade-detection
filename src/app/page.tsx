@@ -395,7 +395,7 @@ export default function Home() {
                     <Box component="span" sx={{ color: '#00FF88', mr: 2, fontWeight: 600 }}>•</Box>
                     <ListItemText
                       primary="智能算法检测"
-                      secondary="基于机器学习的套利机会识别"
+                      secondary="基于启发式算法的套利行为识别"
                       primaryTypographyProps={{ fontWeight: 500 }}
                       secondaryTypographyProps={{ fontWeight: 500 }}
                     />
